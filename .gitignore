@@ -1,0 +1,18 @@
+# Gradle
+.gradle
+build/
+gradle/
+gradlew
+gradlew.bat
+
+# Ant
+local.properties
+build.xml
+
+# IDEA
+.idea/workspace.xml
+.idea/
+*.iml
+
+# OSX
+.DS_Store

@@ -1,6 +1,23 @@
+import com.android.build.gradle.tasks.PackageApplication;
+
 apply plugin: 'android'
 
 android {
+
+    task copyNativeLibs(type: Copy) {
+        from(new File(getProjectDir(), '/libs')) { include '**/*.so' }
+        into new File(buildDir, 'native-libs')
+    }
+
+    tasks.withType(JavaCompile) { compileTask -> compileTask.dependsOn copyNativeLibs }
+
+    clean.dependsOn 'cleanCopyNativeLibs'
+
+    tasks.withType(PackageApplication) { pkgTask ->
+        pkgTask.jniFolders = new HashSet<File>()
+        pkgTask.jniFolders.add(new File(buildDir, 'native-libs'))
+    }
+
     compileSdkVersion 19
     buildToolsVersion "19.0.3"
 
@@ -12,7 +29,7 @@ android {
     }
     buildTypes {
         release {
-            runProguard true
+            runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
@@ -21,6 +38,6 @@ android {
 dependencies {
     compile 'com.android.support:support-v4:19.0.1'
     compile 'com.android.support:appcompat-v7:19.0.1'
-    compile 'com.google.android.gms:play-services:4.0.30'
+//    compile 'com.google.android.gms:play-services:4.0.30'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }

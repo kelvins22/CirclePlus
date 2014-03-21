@@ -3,11 +3,15 @@
 
     <string name="app_name">CirclePlus</string>
     <string name="app_tag">CirclePlus</string>
+    <string name="app_description">
+        CirclePlus is a Check-in app and provides LBS for you.
+    </string>
 
     <string name="action_settings">Settings</string>
     <string name="action_search">Web search</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>
+    <string name="get_location">Get Location</string>
 
     <string-array name="titles_array">
         <item>Home</item>

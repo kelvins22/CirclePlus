@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- TODO: use RelativeLayout -->
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,48 +9,39 @@
         android:id="@+id/pop_left"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/popup_side"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="@android:drawable/btn_default_small"
         android:gravity="center"
         android:textStyle="bold"
         android:textColor="#3814ed"
-        android:text="Update Location"
+        android:text="@string/update_location"
         android:textSize="12sp" />
-
-    <LinearLayout
-        android:id="@+id/pop_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/text_cache"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/popup_middle"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:textColor="@android:color/black"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/pop_down"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/popup_down"
-            android:textColor="@android:color/black"
-            android:textSize="12sp" />
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/pop_right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/popup_right"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@android:drawable/btn_default_small"
         android:gravity="center"
         android:textStyle="bold"
         android:textColor="#3814ed"
-        android:text="Update Marker"
+        android:text="@string/update_marker"
         android:textSize="12sp" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/text_cache"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/pop_left"
+        android:layout_toLeftOf="@id/pop_right"
+        android:background="@android:drawable/btn_default_small"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@android:color/primary_text_light_nodisable"
+        android:textSize="12sp" />
+
+</RelativeLayout>

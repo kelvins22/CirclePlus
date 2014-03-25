@@ -18,11 +18,16 @@ package circleplus.app;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -35,13 +40,27 @@ import com.baidu.mapapi.map.LocationData;
 import com.baidu.mapapi.map.MapController;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MyLocationOverlay;
+import com.baidu.mapapi.search.MKAddrInfo;
+import com.baidu.mapapi.search.MKBusLineResult;
+import com.baidu.mapapi.search.MKDrivingRouteResult;
+import com.baidu.mapapi.search.MKPoiInfo;
+import com.baidu.mapapi.search.MKPoiResult;
+import com.baidu.mapapi.search.MKSearch;
+import com.baidu.mapapi.search.MKSearchListener;
+import com.baidu.mapapi.search.MKShareUrlResult;
+import com.baidu.mapapi.search.MKSuggestionInfo;
+import com.baidu.mapapi.search.MKSuggestionResult;
+import com.baidu.mapapi.search.MKTransitRouteResult;
+import com.baidu.mapapi.search.MKWalkingRouteResult;
 import com.baidu.platform.comapi.basestruct.GeoPoint;
+
+import java.util.List;
 
 public class LocationFragment extends Fragment implements
         View.OnClickListener {
 
     // Debug
-    private static final boolean D = false; //true;
+    private static final boolean D = true;
     private static final String TAG = "LocationFragment";
 
     /*
@@ -64,15 +83,14 @@ public class LocationFragment extends Fragment implements
 
     private Button mGetLocationButton = null;
 
-    /*
-    // Member fields for seaching
+    // Member fields for searching
     private Button mSearchButton = null;
     private AutoCompleteTextView mSearchText = null;
     private MKSearch mSearch = null;
     private ArrayAdapter<String> mSuggestAdapter = null;
     private int mLoadIndex = 0;
     private String mCurrentCity = null;
-    */
+    private boolean mHasLocationData = false;
 
     // Member fields for locating
     private LocationClient mLocationClient = null;
@@ -81,6 +99,7 @@ public class LocationFragment extends Fragment implements
 
     // Location overlay -- blue point
     private FragLocationOverlay mLocationOverlay = null;
+    // TODO: Popup overlay
 //    private PopupOverlay mPopupOverlay = null;
 //    private TextView mPopupText = null;
 
@@ -113,10 +132,8 @@ public class LocationFragment extends Fragment implements
         View v = inflater.inflate(R.layout.location_frag, container, false);
 
         mGetLocationButton = (Button) v.findViewById(R.id.get_location_button);
-        /*
         mSearchText = (AutoCompleteTextView) v.findViewById(R.id.search_loc_text);
         mSearchButton = (Button) v.findViewById(R.id.search_button);
-        */
         mMapView = (CheckInMapView) v.findViewById(R.id.map_view);
 
         mMapController = mMapView.getController();
@@ -135,9 +152,7 @@ public class LocationFragment extends Fragment implements
         }
 
         // Register click listeners
-        /*
         mSearchButton.setOnClickListener(this);
-        */
 
         mGetLocationButton.setOnClickListener(this);
         mGetLocationButton.setText("Locate");
@@ -165,6 +180,7 @@ public class LocationFragment extends Fragment implements
         });
 
         // Initialize locating
+        mHasLocationData = false;
         mLocationClient = new LocationClient(getActivity());
         mLocationData = new LocationData();
         mLocationClient.registerLocationListener(mLocationListener);
@@ -186,7 +202,6 @@ public class LocationFragment extends Fragment implements
         // Refresh on setting location data
         mMapView.refresh();
 
-        /*
         // Initialize search
         mSearch = new MKSearch();
         CirclePlusApp app = (CirclePlusApp) getActivity().getApplicationContext();
@@ -196,7 +211,6 @@ public class LocationFragment extends Fragment implements
                 android.R.layout.simple_dropdown_item_1line);
         mSearchText.setAdapter(mSuggestAdapter);
         mSearchText.addTextChangedListener(new SearchTextWatcher());
-        */
     }
 
     @Override
@@ -217,11 +231,9 @@ public class LocationFragment extends Fragment implements
         if (mLocationClient != null) {
             mLocationClient.stop();
         }
-        /*
         if (mSearch != null) {
             mSearch.destory();
         }
-        */
         mMapView.destroy();
     }
 
@@ -253,20 +265,32 @@ public class LocationFragment extends Fragment implements
                 default:
                     break;
             }
-            /*
+//      // Manual click for searching
         } else if (v == mSearchButton) {
+            /* Search nearby */
             Editable text = mSearchText.getText();
             String poiKey = text == null ? "" : text.toString();
-            if (!TextUtils.isEmpty(mCurrentCity) && !TextUtils.isEmpty(poiKey)) {
-                mSearch.poiSearchInCity(mCurrentCity, poiKey);
+            /*
+             * Search order:
+             * (1) Search nearby by when we have location data (lat lng)
+             * (2) Search in city when we have city info
+             */
+            if (mHasLocationData && !TextUtils.isEmpty(poiKey)) {
+                mSearch.poiSearchNearBy(
+                        poiKey,
+                        new GeoPoint((int) (mLocationData.latitude * 1e6),
+                                (int) (mLocationData.longitude * 1e6)),
+                        LocationUtils.POI_DISTANCE
+                );
+            } else if (mCurrentCity != null && !TextUtils.isEmpty(poiKey)) {
+                mSearch.poiSearchInCity(poiKey, mCurrentCity);
             } else if (!TextUtils.isEmpty(poiKey)) {
-                Toast.makeText(getActivity(), "Can not get city info",
+                Toast.makeText(getActivity(), "Can not get poi info",
                         Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(getActivity(), "Can not get city info or poi info",
+                Toast.makeText(getActivity(), "Can not get location or poi info",
                         Toast.LENGTH_SHORT).show();
             }
-            */
         }
     }
 
@@ -293,6 +317,7 @@ public class LocationFragment extends Fragment implements
      */
     void requestLocClick() {
         isRequest = true;
+        mHasLocationData = false;
         mLocationClient.requestLocation();
         Toast.makeText(getActivity(), "Locating...", Toast.LENGTH_SHORT).show();
     }
@@ -320,12 +345,22 @@ public class LocationFragment extends Fragment implements
                 return;
             }
 
+            mHasLocationData = true;
             mLocationData.latitude = location.getLatitude();
             mLocationData.longitude = location.getLongitude();
             mLocationData.accuracy = location.getRadius();
             mLocationData.direction = location.getDirection();
             mLocationData.satellitesNum = location.getSatelliteNumber();
             mLocationData.speed = location.getSpeed();
+
+            /*
+             * Everything relative to poi not lat lng,
+             * use Baidu map api rather than Baidu location api
+             */
+            // Geocode address info with lat lng data
+            mSearch.reverseGeocode(new GeoPoint(
+                    (int) (mLocationData.latitude * 1e6),
+                    (int) (mLocationData.longitude * 1e6)));
 
             // Update location data
             mLocationOverlay.setData(mLocationData);
@@ -336,7 +371,8 @@ public class LocationFragment extends Fragment implements
             if (isRequest || isFirstLoc) {
                 if (D) Log.d(TAG, "receive location, animate to it");
 
-                mMapController.animateTo(new GeoPoint((int) (mLocationData.latitude * 1e6),
+                mMapController.animateTo(new GeoPoint(
+                        (int) (mLocationData.latitude * 1e6),
                         (int) (mLocationData.longitude * 1e6)));
                 isRequest = false;
 
@@ -344,6 +380,9 @@ public class LocationFragment extends Fragment implements
                 // isRequest is triggered by clicking "locate"
                 mLocationOverlay.setLocationMode(
                         MyLocationOverlay.LocationMode.FOLLOWING);
+                mMapView.getOverlays().remove(mLocationOverlay);
+                mMapView.getOverlays().add(mLocationOverlay);
+                mMapView.refresh();
                 mGetLocationButton.setText("Follow");
                 mCurBtnType = ButtonType.FOLLOW;
             }
@@ -357,7 +396,6 @@ public class LocationFragment extends Fragment implements
         }
     }
 
-    /*
     private class FragSearchListener implements MKSearchListener {
 
         @Override
@@ -414,7 +452,15 @@ public class LocationFragment extends Fragment implements
         }
 
         @Override
-        public void onGetAddrResult(MKAddrInfo mkAddrInfo, int i) {
+        public void onGetAddrResult(MKAddrInfo mkAddrInfo, int error) {
+            if (getActivity() != null) {
+                if (error != 0 || mkAddrInfo == null) {
+                    Toast.makeText(getActivity(), "Get address failed...",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    mCurrentCity = mkAddrInfo.addressComponents.city;
+                }
+            }
         }
 
         @Override
@@ -468,8 +514,8 @@ public class LocationFragment extends Fragment implements
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (s.length() >= 0) {
-
+            if (s.length() >= 0 && !TextUtils.isEmpty(mCurrentCity)) {
+                mSearch.suggestionSearch(s.toString(), mCurrentCity);
             }
         }
 
@@ -477,7 +523,6 @@ public class LocationFragment extends Fragment implements
         public void afterTextChanged(Editable s) {
         }
     }
-    */
 
     /**
      * LocationOverlay -- Blue point

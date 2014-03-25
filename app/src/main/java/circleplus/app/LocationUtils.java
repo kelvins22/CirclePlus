@@ -27,7 +27,10 @@ public final class LocationUtils {
 
     public static final String COORDINATE_TYPE = "bd0911";
 
-    public static final int SCAN_SPAN = 1000 * 1; // millisecond
+    public static final int SCAN_SPAN = 1000 * 10; // millisecond
 
     public static final int DEFAULT_ZOOM = 14;
+
+    public static final int POI_DISTANCE = 1000;
+
 }

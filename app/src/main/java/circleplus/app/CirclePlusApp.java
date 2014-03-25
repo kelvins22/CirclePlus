@@ -25,6 +25,8 @@ import com.baidu.mapapi.MKGeneralListener;
 import com.baidu.mapapi.map.MKEvent;
 
 public class CirclePlusApp extends Application {
+    private static final boolean D = true;
+
     private static CirclePlusApp sInstance = null;
     private boolean mKeyRight = true;
     BMapManager mBMapManager = null;
@@ -89,8 +91,10 @@ public class CirclePlusApp extends Application {
                         Toast.LENGTH_LONG).show();
                 CirclePlusApp.getInstance().mKeyRight = false;
             } else {
-                Toast.makeText(CirclePlusApp.getInstance().getApplicationContext(),
-                        "Authentication success", Toast.LENGTH_LONG).show();
+                if (D) {
+                    Toast.makeText(CirclePlusApp.getInstance().getApplicationContext(),
+                            "Authentication success", Toast.LENGTH_LONG).show();
+                }
                 CirclePlusApp.getInstance().mKeyRight = true;
             }
         }

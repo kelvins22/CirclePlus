@@ -168,6 +168,8 @@ public class MainActivity extends ActionBarActivity {
             fragment = new LocationFragment();
             Bundle args = new Bundle();
             fragment.setArguments(args);
+        } else if (position == 1) {
+            fragment = new FavoriteFragment();
         } else {
             fragment = new Fragment();
         }

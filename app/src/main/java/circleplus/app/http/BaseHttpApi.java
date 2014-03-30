@@ -14,23 +14,23 @@
 * limitations under the License.
 */
 
-package circleplus.app;
+package circleplus.app.http;
 
-/**
- * An utility class for configurations.
- */
-public final class LocationUtils {
+import java.io.IOException;
+import java.net.URL;
 
-    public static final boolean OPEN_GPS = true;
-    public static final boolean ENABLE_MAP_CLICK = true;
-    public static final boolean ENABLE_BUILT_IN_ZOOM_CONTROLS = true;
+import circleplus.app.parser.json.Parser;
+import circleplus.app.types.BaseType;
 
-    public static final String COORDINATE_TYPE = "bd0911";
+public class BaseHttpApi extends AbstractHttpApi {
 
-    public static final int SCAN_SPAN = 1000 * 10; // millisecond
+    public BaseHttpApi() {
+        super(null);
+    }
 
-    public static final int DEFAULT_ZOOM = 14;
-
-    public static final int POI_DISTANCE = 1000;
-
+    @Override
+    public BaseType doHttpRequest(URL url, Parser<? extends BaseType> parser)
+            throws IOException, Exception {
+        return executeHttpRequest(url, REQUEST_METHOD_GET, parser);
+    }
 }

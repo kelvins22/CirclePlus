@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/fav_place_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/fav_star"
+        android:scaleType="centerCrop"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp" />
+
+    <TextView
+        android:id="@+id/fav_place_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textSize="12sp"
+        android:textColor="@android:color/tab_indicator_text" />
+
+    <TextView
+        android:id="@+id/fav_place_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/fav_place_icon"
+        android:layout_toLeftOf="@id/fav_place_time"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="10dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textSize="14sp"
+        android:textColor="@android:color/primary_text_light_nodisable" />
+
+    <TextView
+        android:id="@+id/fav_place_detail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fav_place_name"
+        android:layout_toRightOf="@id/fav_place_icon"
+        android:layout_marginTop="5dp"
+        android:singleLine="true"
+        android:ellipsize="end"
+        android:textSize="12sp"
+        android:textColor="@android:color/secondary_text_light_nodisable" />
+
+    <TextView
+        android:id="@+id/fav_place_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fav_place_detail"
+        android:layout_toRightOf="@id/fav_place_icon"
+        android:layout_marginTop="5dp"
+        android:maxLines="3"
+        android:ellipsize="end"
+        android:textSize="12sp"
+        android:textColor="@android:color/tab_indicator_text" />
+
+</RelativeLayout>

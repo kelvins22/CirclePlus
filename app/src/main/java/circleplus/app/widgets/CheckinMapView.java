@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package circleplus.app;
+package circleplus.app.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -26,20 +26,22 @@ import com.baidu.mapapi.map.PopupOverlay;
 /**
  * MapView with check-in popup overlay.
  */
-public class CheckInMapView extends MapView {
+public class CheckinMapView extends MapView {
 
     private PopupOverlay mPopup;
 
-    public CheckInMapView(Context context) {
+    public CheckinMapView(Context context) {
         super(context);
     }
 
-    public CheckInMapView(Context context, AttributeSet attrs) {
+    public CheckinMapView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public CheckInMapView(Context context, AttributeSet attrs, int defStyle) {
+    public CheckinMapView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+
+        mPopup = null;
     }
 
     @Override

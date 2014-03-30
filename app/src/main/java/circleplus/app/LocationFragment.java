@@ -56,6 +56,10 @@ import com.baidu.platform.comapi.basestruct.GeoPoint;
 
 import java.util.List;
 
+import circleplus.app.utils.LocationUtils;
+import circleplus.app.widgets.CheckinMapView;
+import circleplus.app.widgets.SearchPoiOverlay;
+
 public class LocationFragment extends Fragment implements
         View.OnClickListener {
 
@@ -88,7 +92,6 @@ public class LocationFragment extends Fragment implements
     private AutoCompleteTextView mSearchText = null;
     private MKSearch mSearch = null;
     private ArrayAdapter<String> mSuggestAdapter = null;
-    private int mLoadIndex = 0;
     private String mCurrentCity = null;
     private boolean mHasLocationData = false;
 
@@ -99,19 +102,16 @@ public class LocationFragment extends Fragment implements
 
     // Location overlay -- blue point
     private FragLocationOverlay mLocationOverlay = null;
-    // TODO: Popup overlay
-//    private PopupOverlay mPopupOverlay = null;
-//    private TextView mPopupText = null;
 
     // Map view
-    private CheckInMapView mMapView = null;
+    private CheckinMapView mMapView = null;
     private MapController mMapController = null;
 
     // Handle locating requests
     boolean isRequest = false;
     boolean isFirstLoc = true;
 
-// ---
+// ------------------------------------------------------------
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -128,17 +128,16 @@ public class LocationFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.location_frag, container, false);
 
         mGetLocationButton = (Button) v.findViewById(R.id.get_location_button);
         mSearchText = (AutoCompleteTextView) v.findViewById(R.id.search_loc_text);
         mSearchButton = (Button) v.findViewById(R.id.search_button);
-        mMapView = (CheckInMapView) v.findViewById(R.id.map_view);
+        mMapView = (CheckinMapView) v.findViewById(R.id.map_view);
 
         mMapController = mMapView.getController();
         mLocationOverlay = new FragLocationOverlay(mMapView);
-        createPopupOverlay(inflater);
 
         return v;
     }
@@ -161,6 +160,7 @@ public class LocationFragment extends Fragment implements
         mMapController.setZoom(LocationUtils.DEFAULT_ZOOM);
         mMapController.enableClick(LocationUtils.ENABLE_MAP_CLICK);
         mMapView.setBuiltInZoomControls(LocationUtils.ENABLE_BUILT_IN_ZOOM_CONTROLS);
+
         mMapView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -181,7 +181,7 @@ public class LocationFragment extends Fragment implements
 
         // Initialize locating
         mHasLocationData = false;
-        mLocationClient = new LocationClient(getActivity());
+        mLocationClient = new LocationClient(getActivity().getApplicationContext());
         mLocationData = new LocationData();
         mLocationClient.registerLocationListener(mLocationListener);
         LocationClientOption option = new LocationClientOption();
@@ -272,7 +272,7 @@ public class LocationFragment extends Fragment implements
             String poiKey = text == null ? "" : text.toString();
             /*
              * Search order:
-             * (1) Search nearby by when we have location data (lat lng)
+             * (1) Search nearby when we have location data (lat lng)
              * (2) Search in city when we have city info
              */
             if (mHasLocationData && !TextUtils.isEmpty(poiKey)) {
@@ -294,32 +294,18 @@ public class LocationFragment extends Fragment implements
         }
     }
 
-    private void createPopupOverlay(LayoutInflater inflater) {
-        /*
-        View viewCache = inflater.inflate(R.layout.custom_text_view, null);
-        mPopupText = (TextView) viewCache.findViewById(R.id.text_cache);
-
-        PopupClickListener popupListener = new PopupClickListener() {
-            @Override
-            public void onClickedPopup(int index) {
-                Log.v(TAG, "Click popup overlay, index = " + index);
-                Toast.makeText(getActivity(), "A popup window to check in like foursquare",
-                        Toast.LENGTH_LONG).show();
-            }
-        };
-        mPopupOverlay = new PopupOverlay(mMapView, popupListener);
-        mMapView.setPopup(mPopupOverlay);
-        */
-    }
-
     /**
      * Manual click to send a request.
      */
     void requestLocClick() {
         isRequest = true;
         mHasLocationData = false;
-        mLocationClient.requestLocation();
-        Toast.makeText(getActivity(), "Locating...", Toast.LENGTH_SHORT).show();
+        if (mLocationClient != null && mLocationClient.isStarted()) {
+            mLocationClient.requestLocation();
+            Toast.makeText(getActivity(), "Locating...", Toast.LENGTH_SHORT).show();
+        } else {
+            Log.d(TAG, "Location Client is not started...");
+        }
     }
 
     /*
@@ -433,6 +419,7 @@ public class LocationFragment extends Fragment implements
                             sb.append(mkPoiResult.getCityListInfo(i).city);
                             sb.append("  ");
                         }
+                        // TODO: make it more elegant
                         Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_LONG).show();
                     }
                 } // end else
@@ -485,25 +472,26 @@ public class LocationFragment extends Fragment implements
 
         @Override
         public void onGetPoiDetailSearchResult(int type, int error) {
-            // error == 0 indicates success
-            if (getActivity() != null) {
-                if (error != 0) {
-                    Toast.makeText(getActivity(), "Nothing found...",
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    if (D) {
-                        Toast.makeText(getActivity(), "Check detail info.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-                    // TODO: Show a detail info popup window
-                }
-            }
+            // Do nothing here
+            /*
+             * MKSearch.poiDetailSearch() will enter here,
+             * and it will go to PlaceCaterActivity
+             */
         }
 
         @Override
         public void onGetShareUrlResult(MKShareUrlResult mkShareUrlResult, int type, int error) {
-            // TODO: Add share function
-        }
+            // TODO: add share function later
+            /*
+            if (error == 0) {
+                if (type == MKEvent.MKEVENT_POIDETAILSHAREURL) {
+
+                } else if (type == MKEvent.MKEVENT_POIRGCSHAREURL) {
+
+                }
+            }
+            */
+        } // end onGetShareUrlResult()
     }
 
     private class SearchTextWatcher implements TextWatcher {
@@ -535,34 +523,8 @@ public class LocationFragment extends Fragment implements
 
         @Override
         protected boolean dispatchTap() {
-            /*
-            // Handle tap event, show the bubble
-            StringBuilder sb = new StringBuilder();
-            if (D) {
-                mPopupText.setBackgroundResource(android.R.drawable.dialog_holo_light_frame);
-                sb.append("My Location = (");
-                sb.append(mLocationData.latitude);
-                sb.append(", ");
-                sb.append(mLocationData.longitude);
-                sb.append(")");
-            } else {
-                mPopupText.setBackgroundResource(0);
-                mPopupText.setCompoundDrawablesWithIntrinsicBounds(
-                        0, 0, 0, R.drawable.location_popup);
-                int pad = (int) (getResources().getDisplayMetrics().density * 3 + 0.5f);
-                mPopupText.setCompoundDrawablePadding(pad);
-                sb.append("Check-in");
-            }
-            mPopupText.setText(sb.toString());
-            mPopupOverlay.showPopup(
-                    getBitmapFromView(mPopupText),  // drawable
-                    new GeoPoint((int) (mLocationData.latitude * 1e6),  // geo point x
-                            (int) (mLocationData.longitude * 1e6)),     // geo point y
-                    8   // radius
-            );
+            // TODO: show a popup window
             return true;
-            */
-            return false;
         }
     }
 

@@ -57,7 +57,7 @@ public class CheckinListAdapter extends BaseListAdapter {
         Checkin checkin = (Checkin) getItem(position);
         holder.time.setText(checkin.getCreated());
         holder.name.setText(checkin.getName());
-        holder.detail.setText(checkin.getPlace());
+        holder.detail.setText(checkin.getLoc().getAddress());
         holder.text.setText(checkin.getShout());
 
         return convertView;

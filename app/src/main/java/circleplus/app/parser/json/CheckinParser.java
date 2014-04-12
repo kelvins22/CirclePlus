@@ -25,24 +25,25 @@ public class CheckinParser extends AbstractParser<Checkin> {
 
     @Override
     public Checkin parse(JSONObject json) throws JSONException {
-
         Checkin obj = new Checkin();
         if (json.has("created")) {
             obj.setCreated(json.getString("created"));
         }
-        if (json.has("distance")) {
-            obj.setDistance(json.getString("distance"));
-        }
         if (json.has("id")) {
-            obj.setId(json.getString("id"));
+            obj.setId(json.getLong("id"));
+        }
+        if (json.has("name")) {
+            obj.setName(json.getString("name"));
         }
         if (json.has("shout")) {
             obj.setShout(json.getString("shout"));
         }
+        if (json.has("loc")) {
+            obj.setLoc(new LocParser().parse(json.getJSONObject("loc")));
+        }
         if (json.has("user")) {
             obj.setUser(new UserParser().parse(json.getJSONObject("user")));
         }
-
         return obj;
     }
 }

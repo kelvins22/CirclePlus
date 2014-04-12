@@ -24,19 +24,15 @@ import circleplus.app.utils.ParcelUtils;
 public class User implements BaseType, Parcelable {
 
     private int mCheckinCount;
-    private Checkin mCheckin;
     private String mCreated;
     private String mEmail;
-    private String mFirstname;
     private int mFollowerCount;
     private int mFriendCount;
     private String mGender;
-    private String mHometown;
-    private String mId;
-    private String mLastname;
+    private long mId;
+    private String mName;
     private String mPhone;
     private String mPhoto;
-//    private Settings mSettings;
 
     public User() {
     }
@@ -45,23 +41,13 @@ public class User implements BaseType, Parcelable {
         mCheckinCount = in.readInt();
         mCreated = ParcelUtils.readStringFromParcel(in);
         mEmail = ParcelUtils.readStringFromParcel(in);
-        mFirstname = ParcelUtils.readStringFromParcel(in);
         mFollowerCount = in.readInt();
         mFriendCount = in.readInt();
         mGender = ParcelUtils.readStringFromParcel(in);
-        mHometown = ParcelUtils.readStringFromParcel(in);
-        mId = ParcelUtils.readStringFromParcel(in);
-        mLastname = ParcelUtils.readStringFromParcel(in);
+        mId = in.readLong();
+        mName = ParcelUtils.readStringFromParcel(in);
         mPhone = ParcelUtils.readStringFromParcel(in);
         mPhoto = ParcelUtils.readStringFromParcel(in);
-
-        if (in.readInt() == 1) {
-            mCheckin = in.readParcelable(Checkin.class.getClassLoader());
-        }
-
-//        if (in.readInt() == 1) {
-//            mSettings = in.readParcelable(Settings.class.getClassLoader());
-//        }
     }
 
     public static final Parcelable.Creator<User> CREATOR =
@@ -77,14 +63,6 @@ public class User implements BaseType, Parcelable {
                     return new User[size];
                 }
             };
-
-    public Checkin getCheckin() {
-        return mCheckin;
-    }
-
-    public void setCheckin(Checkin checkin) {
-        mCheckin = checkin;
-    }
 
     public int getCheckinCount() {
         return mCheckinCount;
@@ -108,14 +86,6 @@ public class User implements BaseType, Parcelable {
 
     public void setEmail(String email) {
         mEmail = email;
-    }
-
-    public String getFirstname() {
-        return mFirstname;
-    }
-
-    public void setFirstname(String firstname) {
-        mFirstname = firstname;
     }
 
     public int getFollowerCount() {
@@ -142,28 +112,20 @@ public class User implements BaseType, Parcelable {
         mGender = gender;
     }
 
-    public String getHometown() {
-        return mHometown;
-    }
-
-    public void setHometown(String hometown) {
-        mHometown = hometown;
-    }
-
-    public String getId() {
+    public long getId() {
         return mId;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         mId = id;
     }
 
-    public String getLastname() {
-        return mLastname;
+    public String getName() {
+        return mName;
     }
 
-    public void setLastname(String lastname) {
-        mLastname = lastname;
+    public void setName(String name) {
+        mName = name;
     }
 
     public String getPhone() {
@@ -182,42 +144,18 @@ public class User implements BaseType, Parcelable {
         mPhoto = photo;
     }
 
-//    public Settings getSettings() {
-//        return mSettings;
-//    }
-
-//    public void setSettings(Settings settings) {
-//        mSettings = settings;
-//    }
-
     @Override
     public void writeToParcel(Parcel out, int flags) {
         out.writeInt(mCheckinCount);
         ParcelUtils.writeStringToParcel(out, mCreated);
         ParcelUtils.writeStringToParcel(out, mEmail);
-        ParcelUtils.writeStringToParcel(out, mFirstname);
         out.writeInt(mFollowerCount);
         out.writeInt(mFriendCount);
         ParcelUtils.writeStringToParcel(out, mGender);
-        ParcelUtils.writeStringToParcel(out, mHometown);
-        ParcelUtils.writeStringToParcel(out, mId);
-        ParcelUtils.writeStringToParcel(out, mLastname);
+        out.writeLong(mId);
+        ParcelUtils.writeStringToParcel(out, mName);
         ParcelUtils.writeStringToParcel(out, mPhone);
         ParcelUtils.writeStringToParcel(out, mPhoto);
-
-        if (mCheckin != null) {
-            out.writeInt(1);
-            out.writeParcelable(mCheckin, flags);
-        } else {
-            out.writeInt(0);
-        }
-
-//        if (mSettings != null) {
-//            out.writeInt(1);
-//            out.writeParcelable(mSettings, flags);
-//        } else {
-//            out.writeInt(0);
-//        }
     }
 
     @Override

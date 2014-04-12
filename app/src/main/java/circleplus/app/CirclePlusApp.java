@@ -31,7 +31,7 @@ public class CirclePlusApp extends Application {
     private boolean mKeyRight = true;
     BMapManager mBMapManager = null;
 
-    public static final String KEY_STR = "your_key";
+    public static final String KEY_STR = "V8yoGVZOWwLGTCTyxseRqzfQ";
 
     @Override
     public void onCreate() {

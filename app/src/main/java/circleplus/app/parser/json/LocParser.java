@@ -19,42 +19,39 @@ package circleplus.app.parser.json;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import circleplus.app.types.User;
+import circleplus.app.types.Loc;
 
-public class UserParser extends AbstractParser<User> {
+public class LocParser extends AbstractParser<Loc> {
 
     @Override
-    public User parse(JSONObject json) throws JSONException {
-        User obj = new User();
-        if (json.has("checkinCount")) {
-            obj.setCheckinCount(json.getInt("checkinCount"));
+    public Loc parse(JSONObject json) throws JSONException {
+        Loc obj = new Loc();
+        if (json.has("address")) {
+            obj.setAddress(json.getString("address"));
         }
-        if (json.has("created")) {
-            obj.setCreated(json.getString("created"));
-        }
-        if (json.has("email")) {
-            obj.setEmail(json.getString("email"));
-        }
-        if (json.has("followerCount")) {
-            obj.setFollowerCount(json.getInt("followerCount"));
-        }
-        if (json.has("friendCount")) {
-            obj.setFriendCount(json.getInt("friendCount"));
-        }
-        if (json.has("gender")) {
-            obj.setGender(json.getString("gender"));
+        if (json.has("city")) {
+            obj.setCity(json.getString("city"));
         }
         if (json.has("id")) {
             obj.setId(json.getLong("id"));
         }
+        if (json.has("lat")) {
+            obj.setLat(json.getLong("lat"));
+        }
+        if (json.has("lng")) {
+            obj.setLng(json.getLong("lng"));
+        }
         if (json.has("name")) {
             obj.setName(json.getString("name"));
         }
-        if (json.has("phone")) {
-            obj.setPhone(json.getString("phone"));
+        if (json.has("nation")) {
+            obj.setNation(json.getString("nation"));
         }
-        if (json.has("photo")) {
-            obj.setPhoto(json.getString("photo"));
+        if (json.has("province")) {
+            obj.setProvince(json.getString("province"));
+        }
+        if (json.has("type")) {
+            obj.setType(json.getInt("type"));
         }
         return obj;
     }

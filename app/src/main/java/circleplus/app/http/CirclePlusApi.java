@@ -28,18 +28,12 @@ import circleplus.app.types.TypeArrayList;
 
 public class CirclePlusApi {
 
-    static final String AUTH_KEY = "your_key";
+    private static final String CIRCLE_PLUS_URL = "192.168.1.115/";
 
-    static final String GEOTABLE_URL = "http://api.map.baidu.com/geodata/v3/geotable/";
-    static final String COLUMN_URL = "http://api.map.baidu.com/geodata/v3/column/";
-
-    static final String LIST_GEOTABLE_URL = GEOTABLE_URL + "list";
-    static final String DETAIL_GEOTABLE_URL = GEOTABLE_URL + "detail";
-    static final String UPDATE_GEOTABLE_URL = GEOTABLE_URL + "update";
-
-    static final String LIST_COLUMN_URL = COLUMN_URL + "list";
-    static final String DETAIL_COLUMN_URL = COLUMN_URL + "detail";
-    static final String UPDATE_COLUMN_URL = COLUMN_URL + "update";
+    private static final String REGISTER_URL = CIRCLE_PLUS_URL + "register";
+    private static final String LOGIN_URL = CIRCLE_PLUS_URL + "login";
+    private static final String LIST_FAVORITE_URL = CIRCLE_PLUS_URL + "listFavourite";
+    private static final String CHECKIN_URL = CIRCLE_PLUS_URL + "checkin";
 
     private AbstractHttpApi mHttpApi = null;
 
@@ -47,13 +41,10 @@ public class CirclePlusApi {
         mHttpApi = new BaseHttpApi();
     }
 
-    public void listGeotable() {
-    }
-
     public TypeArrayList<Checkin> getFavorites() throws IOException, Exception {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("ak", AUTH_KEY);
-        URL url = AbstractHttpApi.createHttpUrl(LIST_GEOTABLE_URL, params);
+        params.put("user", "kelei");
+        URL url = AbstractHttpApi.createHttpUrl(LIST_FAVORITE_URL, params);
         return (TypeArrayList<Checkin>)
                 (mHttpApi.doHttpRequest(url, new ArrayParser(new CheckinParser())));
     }

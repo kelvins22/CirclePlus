@@ -24,10 +24,9 @@ import circleplus.app.utils.ParcelUtils;
 public class Checkin implements BaseType, Parcelable {
 
     private String mCreated;
-    private String mDistance;
-    private String mId;
+    private long mId;
+    private Loc mLoc;
     private String mName;
-    private String mPlace;
     private String mShout;
     private User mUser;
 
@@ -36,12 +35,13 @@ public class Checkin implements BaseType, Parcelable {
 
     private Checkin(Parcel in) {
         mCreated = ParcelUtils.readStringFromParcel(in);
-        mDistance = ParcelUtils.readStringFromParcel(in);
-        mId = ParcelUtils.readStringFromParcel(in);
+        mId = in.readLong();
         mName = ParcelUtils.readStringFromParcel(in);
-        mPlace = ParcelUtils.readStringFromParcel(in);
         mShout = ParcelUtils.readStringFromParcel(in);
 
+        if (in.readInt() == 1) {
+            mLoc = in.readParcelable(Loc.class.getClassLoader());
+        }
         if (in.readInt() == 1) {
             mUser = in.readParcelable(User.class.getClassLoader());
         }
@@ -69,19 +69,19 @@ public class Checkin implements BaseType, Parcelable {
         mCreated = created;
     }
 
-    public String getDistance() {
-        return mDistance;
+    public Loc getLoc() {
+        return mLoc;
     }
 
-    public void setDistance(String distance) {
-        mDistance = distance;
+    public void setLoc(Loc loc) {
+        mLoc = loc;
     }
 
-    public String getId() {
+    public long getId() {
         return mId;
     }
 
-    public void setId(String id) {
+    public void setId(long id) {
         mId = id;
     }
 
@@ -91,14 +91,6 @@ public class Checkin implements BaseType, Parcelable {
 
     public void setName(String name) {
         mName = name;
-    }
-
-    public String getPlace() {
-        return mPlace;
-    }
-
-    public void setPlace(String place) {
-        mPlace = place;
     }
 
     public String getShout() {
@@ -120,12 +112,16 @@ public class Checkin implements BaseType, Parcelable {
     @Override
     public void writeToParcel(Parcel out, int flags) {
         ParcelUtils.writeStringToParcel(out, mCreated);
-        ParcelUtils.writeStringToParcel(out, mDistance);
-        ParcelUtils.writeStringToParcel(out, mId);
+        out.writeLong(mId);
         ParcelUtils.writeStringToParcel(out, mName);
-        ParcelUtils.writeStringToParcel(out, mPlace);
         ParcelUtils.writeStringToParcel(out, mShout);
 
+        if (mLoc != null) {
+            out.writeInt(1);
+            out.writeParcelable(mLoc, flags);
+        } else {
+            out.writeInt(0);
+        }
         if (mUser != null) {
             out.writeInt(1);
             out.writeParcelable(mUser, flags);

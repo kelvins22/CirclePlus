@@ -32,6 +32,7 @@ public class JSONUtils {
     private static final String TAG = "JSONUtils";
     private static final boolean D = true;
 
+    @SuppressWarnings("unchecked")
     public static BaseType consume(Parser<? extends BaseType> parser,
             String content) throws Exception {
         if (D) Log.d(TAG, "http response: " + content);
@@ -41,6 +42,7 @@ public class JSONUtils {
             Iterator<String> it = (Iterator<String>) json.keys();
             if (it.hasNext()) {
                 String key = it.next();
+                // we had checked network error on http level
                 if ("error".equals(key)) {
                     throw new Exception(json.getString(key));
                 } else {

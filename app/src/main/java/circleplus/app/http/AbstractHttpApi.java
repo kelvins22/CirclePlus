@@ -42,7 +42,7 @@ public abstract class AbstractHttpApi implements HttpApi {
 
     private static final String DEFAULT_CLIENT_VERSION = "circleplus.app";
     private static final String CLIENT_VERSION_HEADER = "User-Agent";
-    private static final int TIMEOUT = 60 * 1000; /* milliseconds */
+    private static final int TIMEOUT = 15 * 1000; // 60 * 1000; /* milliseconds */
 
     private final String mClientVersion;
 
@@ -109,23 +109,29 @@ public abstract class AbstractHttpApi implements HttpApi {
         if (D) Log.d(TAG, "execute method: " + requestMethod + " url: " + url.toString());
 
         String method;
+        boolean isPost;
         switch (requestMethod) {
             case REQUEST_METHOD_GET:
                 method = "GET";
+                isPost = false;
                 break;
             case REQUEST_METHOD_POST:
                 method = "POST";
+                isPost = true;
                 break;
             default:
                 method = "GET";
+                isPost = false;
                 break;
         }
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(TIMEOUT);
         conn.setConnectTimeout(TIMEOUT);
+        conn.setRequestProperty("Content-Type", "text/json; charset=utf-8");
         conn.setRequestMethod(method);
-        conn.setDoOutput(true);
+        /* setDoOutput(true) equals setRequestMethod("POST") */
+        conn.setDoOutput(isPost);
         conn.setChunkedStreamingMode(0);
         // Starts the query
         conn.connect();
@@ -135,7 +141,7 @@ public abstract class AbstractHttpApi implements HttpApi {
 
     public static URL createHttpUrl(String url, Map<String, String> params)
             throws IOException {
-        if (D) Log.d(TAG, "url " + url);
+        if (D) Log.d(TAG, "url: " + url);
         String requestParams = createStringParams(params);
         return new URL(url + requestParams);
     }
@@ -165,7 +171,7 @@ public abstract class AbstractHttpApi implements HttpApi {
     }
 
     public static String readStream(InputStream is, int len)
-            throws IOException, UnsupportedEncodingException {
+            throws UnsupportedEncodingException, IOException {
         Reader reader = new InputStreamReader(is, "UTF-8");
         try {
             char[] buffer = new char[len];

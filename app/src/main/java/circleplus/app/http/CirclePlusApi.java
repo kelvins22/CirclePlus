@@ -16,6 +16,8 @@
 
 package circleplus.app.http;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -23,12 +25,14 @@ import java.util.Map;
 
 import circleplus.app.parser.json.ArrayParser;
 import circleplus.app.parser.json.CheckinParser;
+import circleplus.app.parser.json.StatusParser;
 import circleplus.app.types.Checkin;
+import circleplus.app.types.Status;
 import circleplus.app.types.TypeArrayList;
 
 public class CirclePlusApi {
 
-    private static final String CIRCLE_PLUS_URL = "192.168.1.115/";
+    private static final String CIRCLE_PLUS_URL = "http://192.168.1.115:9000/";
 
     private static final String REGISTER_URL = CIRCLE_PLUS_URL + "register";
     private static final String LOGIN_URL = CIRCLE_PLUS_URL + "login";
@@ -39,6 +43,18 @@ public class CirclePlusApi {
 
     public CirclePlusApi() {
         mHttpApi = new BaseHttpApi();
+    }
+
+    public Status register(String username, String password, String email,
+            String phone, String gender) throws IOException, Exception {
+        JSONObject json = new JSONObject();
+        json.put("username", username);
+        json.put("password", password);
+        json.put("email", email);
+        json.put("phone", phone);
+        json.put("gender", gender);
+        URL url = new URL(REGISTER_URL);
+        return (Status) (mHttpApi.doHttpJsonPost(url, json, new StatusParser()));
     }
 
     public TypeArrayList<Checkin> getFavorites() throws IOException, Exception {

@@ -16,6 +16,7 @@
 
 package circleplus.app;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -172,6 +173,8 @@ public class MainActivity extends ActionBarActivity {
             fragment = new FavoriteFragment();
         } else {
             fragment = new Fragment();
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
         }
 
         // Insert the fragment by replacing any existing fragment

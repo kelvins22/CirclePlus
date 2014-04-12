@@ -16,6 +16,8 @@
 
 package circleplus.app.http;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.URL;
 
@@ -24,8 +26,15 @@ import circleplus.app.types.BaseType;
 
 public interface HttpApi {
 
+    /* GET */
     public abstract BaseType doHttpRequest(URL url, Parser<? extends BaseType> parser)
             throws IOException, Exception;
 
-    public abstract String doHttpPost(URL url) throws IOException, Exception;
+    /* POST */
+    public abstract BaseType doHttpPost(URL url, Parser<? extends BaseType> parser)
+            throws IOException, Exception;
+
+    /* POST JSON */
+    public abstract BaseType doHttpJsonPost(URL url, JSONObject jsonObject,
+            Parser<? extends BaseType> parser) throws IOException, Exception;
 }

@@ -35,6 +35,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="circleplus.app.RegisterActivity"
+            android:label="@string/label_register" />
         <!-- Baidu Place Detail Activity -->
         <activity
             android:name="com.baidu.mapapi.search.PlaceCaterActivity"

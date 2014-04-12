@@ -18,9 +18,12 @@ package circleplus.app.http;
 
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -42,6 +45,9 @@ public abstract class AbstractHttpApi implements HttpApi {
 
     private static final String DEFAULT_CLIENT_VERSION = "circleplus.app";
     private static final String CLIENT_VERSION_HEADER = "User-Agent";
+    private static final String JSON_CONTENT_TYPE = "text/json";
+    private static final String JSON_UTF8_CONTENT_TYPE = "text/json; charset=utf-8";
+    private static final String UTF8_CHARSET = "UTF-8";
     private static final int TIMEOUT = 15 * 1000; // 60 * 1000; /* milliseconds */
 
     private final String mClientVersion;
@@ -54,18 +60,22 @@ public abstract class AbstractHttpApi implements HttpApi {
         }
     }
 
-    @Override
-    public String doHttpPost(URL url) throws IOException, Exception {
-        // TODO:
-        return "";
-    }
-
-    public BaseType executeHttpRequest(URL url, int method,
+    protected BaseType executeHttpRequest(URL url, int method, JSONObject json,
             Parser<? extends BaseType> parser) throws IOException, Exception {
         InputStream is = null;
+        OutputStream os = null;
         HttpURLConnection conn = null;
         try {
-            conn = getHttpURLConnection(url, method);
+            if (method == REQUEST_METHOD_POST && json != null) {
+                conn = getHttpURLConnection(url, method, true);
+                byte[] bytes = json.toString(0).getBytes(UTF8_CHARSET);
+                os = conn.getOutputStream();
+                os.write(bytes);
+                os.flush();
+                os.close();
+            } else {
+                conn = getHttpURLConnection(url, method);
+            }
 
             int response = conn.getResponseCode();
             if (D) Log.d(TAG, "Response code = " + response);
@@ -101,12 +111,21 @@ public abstract class AbstractHttpApi implements HttpApi {
             if (is != null) {
                 is.close();
             }
+            if (os != null) {
+                os.close();
+            }
         }
     }
 
-    public static HttpURLConnection getHttpURLConnection(URL url, int requestMethod)
+    private static HttpURLConnection getHttpURLConnection(URL url, int requestMethod)
             throws IOException {
-        if (D) Log.d(TAG, "execute method: " + requestMethod + " url: " + url.toString());
+        return getHttpURLConnection(url, requestMethod, false);
+    }
+
+    private static HttpURLConnection getHttpURLConnection(URL url, int requestMethod,
+            boolean acceptJson) throws IOException {
+        if (D) Log.d(TAG, "execute method: " + requestMethod
+                + " url: " + url.toString() + " accept JSON ?= " + acceptJson);
 
         String method;
         boolean isPost;
@@ -128,7 +147,10 @@ public abstract class AbstractHttpApi implements HttpApi {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setReadTimeout(TIMEOUT);
         conn.setConnectTimeout(TIMEOUT);
-        conn.setRequestProperty("Content-Type", "text/json; charset=utf-8");
+        conn.setRequestProperty("Content-Type", JSON_UTF8_CONTENT_TYPE);
+        if (isPost && acceptJson) {
+            conn.setRequestProperty("Accept", JSON_CONTENT_TYPE);
+        }
         conn.setRequestMethod(method);
         /* setDoOutput(true) equals setRequestMethod("POST") */
         conn.setDoOutput(isPost);
@@ -146,7 +168,7 @@ public abstract class AbstractHttpApi implements HttpApi {
         return new URL(url + requestParams);
     }
 
-    public static String createStringParams(Map<String, String> params) {
+    private static String createStringParams(Map<String, String> params) {
         if (params == null || params.size() == 0) {
             return "";
         }
@@ -170,7 +192,7 @@ public abstract class AbstractHttpApi implements HttpApi {
         return sb.toString();
     }
 
-    public static String readStream(InputStream is, int len)
+    private static String readStream(InputStream is, int len)
             throws UnsupportedEncodingException, IOException {
         Reader reader = new InputStreamReader(is, "UTF-8");
         try {

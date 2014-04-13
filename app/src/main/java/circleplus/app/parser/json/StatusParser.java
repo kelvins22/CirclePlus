@@ -21,16 +21,16 @@ import org.json.JSONObject;
 
 import circleplus.app.types.Status;
 
-/**
- * Parse JSON contains only "status" or "error" key.
- */
 public class StatusParser extends AbstractParser<Status> {
 
     @Override
     public Status parse(JSONObject json) throws JSONException {
         Status obj = new Status();
         if (json.has("status")) {
-            obj.setContent(json.getString("status"));
+            obj.setStatusCode(json.getInt("status"));
+        }
+        if (json.has("message")) {
+            obj.setMessage(json.getString("message"));
         }
         return obj;
     }

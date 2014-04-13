@@ -16,6 +16,8 @@
     <string name="search_loc_hint">Type location and search</string>
 
     <string name="welcome_register">Welcome to register your account of Circle Plus</string>
+    <string name="go_to_register">Don\'t have a Circle Plus account, go to register</string>
+    <string name="login_failed">There\'s no user login&#8230; Please try again.</string>
     <string name="username">Username:</string>
     <string name="password">Password:</string>
     <string name="email">Email:</string>
@@ -25,11 +27,18 @@
     <string name="female">Female</string>
     <string name="register">REGISTER</string>
     <string name="label_register">Register</string>
+    <string name="login">LOGIN</string>
+    <string name="logout">Logout</string>
+    <string name="label_login">Login</string>
+    <string name="join">Join at</string>
+    <string name="checkin_count_title">Checkin:</string>
+    <string name="follower_count_title">Follower:</string>
+    <string name="friend_count_title">Friend:</string>
 
     <string-array name="titles_array">
         <item>Home</item>
         <item>Favorites</item>
-        <item>Friends</item>
+        <item>About Me</item>
     </string-array>
 
 </resources>

@@ -23,13 +23,15 @@ import circleplus.app.utils.ParcelUtils;
 
 public class Status implements BaseType, Parcelable {
 
-    private String mContent;
+    private int mCode;
+    private String mMessage;
 
     public Status() {
     }
 
     private Status(Parcel in) {
-        mContent = ParcelUtils.readStringFromParcel(in);
+        mCode = in.readInt();
+        mMessage = ParcelUtils.readStringFromParcel(in);
     }
 
     public static final Parcelable.Creator<Status> CREATOR =
@@ -46,17 +48,26 @@ public class Status implements BaseType, Parcelable {
                 }
             };
 
-    public String getContent() {
-        return mContent;
+    public int getStatusCode() {
+        return mCode;
     }
 
-    public void setContent(String content) {
-        mContent = content;
+    public void setStatusCode(int statusCode) {
+        mCode = statusCode;
+    }
+
+    public String getMessage() {
+        return mMessage;
+    }
+
+    public void setMessage(String message) {
+        mMessage = message;
     }
 
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        ParcelUtils.writeStringToParcel(out, mContent);
+        out.writeInt(mCode);
+        ParcelUtils.writeStringToParcel(out, mMessage);
     }
 
     @Override

@@ -43,8 +43,9 @@ public class JSONUtils {
             if (it.hasNext()) {
                 String key = it.next();
                 // we had checked network error on http level
+                // so the parser here must be instance of StatusParser
                 if ("error".equals(key)) {
-                    throw new Exception(json.getString(key));
+                    return parser.parse(json.getJSONObject(key));
                 } else {
                     Object obj = json.get(key);
                     if (obj instanceof JSONArray) {

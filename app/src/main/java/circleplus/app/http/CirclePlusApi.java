@@ -26,6 +26,8 @@ import java.util.Map;
 import circleplus.app.parser.json.ArrayParser;
 import circleplus.app.parser.json.CheckinParser;
 import circleplus.app.parser.json.StatusParser;
+import circleplus.app.parser.json.UserParser;
+import circleplus.app.types.BaseType;
 import circleplus.app.types.Checkin;
 import circleplus.app.types.Status;
 import circleplus.app.types.TypeArrayList;
@@ -48,7 +50,7 @@ public class CirclePlusApi {
     public Status register(String username, String password, String email,
             String phone, String gender) throws IOException, Exception {
         JSONObject json = new JSONObject();
-        json.put("username", username);
+        json.put("name", username);
         json.put("password", password);
         json.put("email", email);
         json.put("phone", phone);
@@ -57,9 +59,17 @@ public class CirclePlusApi {
         return (Status) (mHttpApi.doHttpJsonPost(url, json, new StatusParser()));
     }
 
+    public BaseType login(String username, String password)
+            throws IOException, Exception {
+        JSONObject json = new JSONObject();
+        json.put("name", username);
+        json.put("password", password);
+        URL url = new URL(LOGIN_URL);
+        return mHttpApi.doHttpJsonPost(url, json, new UserParser());
+    }
+
     public TypeArrayList<Checkin> getFavorites() throws IOException, Exception {
         Map<String, String> params = new HashMap<String, String>();
-        params.put("user", "kelei");
         URL url = AbstractHttpApi.createHttpUrl(LIST_FAVORITE_URL, params);
         return (TypeArrayList<Checkin>)
                 (mHttpApi.doHttpRequest(url, new ArrayParser(new CheckinParser())));

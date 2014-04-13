@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import circleplus.app.parser.json.Parser;
+import circleplus.app.parser.json.StatusParser;
 import circleplus.app.types.BaseType;
 import circleplus.app.utils.JSONUtils;
 
@@ -84,13 +85,16 @@ public abstract class AbstractHttpApi implements HttpApi {
                 case 200:
                     is = conn.getInputStream();
                     // TODO: calculate length
-                    String content = readStream(is, 1024 * 10);
+                    String content = readStream(is, 2048);
                     if (D) Log.d(TAG, content);
                     return JSONUtils.consume(parser, content);
 
+                // BAD REQUEST
                 case 400:
-                    if (D) Log.d(TAG, "Http code: 400");
-                    throw new IOException("Http code: 400");
+                    is = conn.getErrorStream();
+                    String errorContent = readStream(is, 128);
+                    if (D) Log.d(TAG, "Http code: 400. Error message: " + errorContent);
+                    return JSONUtils.consume(new StatusParser(), errorContent);
 
                 case 404:
                     if (D) Log.d(TAG, "Http code: 404");

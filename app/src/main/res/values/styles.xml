@@ -5,4 +5,13 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="popup_window_anim_style">
+        <item name="android:windowEnterAnimation">
+            @anim/popup_in
+        </item>
+        <item name="android:windowExitAnimation">
+            @anim/popup_out
+        </item>
+    </style>
+
 </resources>

@@ -27,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -37,6 +38,7 @@ public class UserInfoFragment extends Fragment {
 
     private static final int LOGIN_REQ_CODE = 0x1;
 
+    private ImageView mUserAvatar;
     private TextView mUsernameText, mCreatedText, mGenderText;
     private TextView mEmailText, mPhoneText;
     private TextView mCheckinText, mFollowerText, mFriendText;
@@ -66,6 +68,7 @@ public class UserInfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.user_info_layout, container, false);
         mEmptyFrame = (FrameLayout) view.findViewById(R.id.empty_frame);
         mInfoFrame = (RelativeLayout) view.findViewById(R.id.info_frame);
+        mUserAvatar = (ImageView) mInfoFrame.findViewById(R.id.avatar_image_view);
         mUsernameText = (TextView) mInfoFrame.findViewById(R.id.info_username);
         mCreatedText = (TextView) mInfoFrame.findViewById(R.id.info_created);
         mGenderText = (TextView) mInfoFrame.findViewById(R.id.info_gender);
@@ -134,6 +137,9 @@ public class UserInfoFragment extends Fragment {
         });
 
         mInfoFrame.setVisibility(View.VISIBLE);
+        int res = "Male".equals(mUser.getGender()) ? R.drawable.blank_boy
+                : R.drawable.blank_girl;
+        mUserAvatar.setImageResource(res);
         mUsernameText.setText(getString(R.string.username)
                 + " " + mUser.getName());
         mCreatedText.setText(getString(R.string.join)

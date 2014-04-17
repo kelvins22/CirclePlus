@@ -35,7 +35,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/common_avatar" />
+            android:src="@drawable/blank_boy" />
 
         <TextView
             android:id="@+id/info_username"

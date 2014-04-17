@@ -28,9 +28,7 @@ import circleplus.app.parser.json.CheckinParser;
 import circleplus.app.parser.json.StatusParser;
 import circleplus.app.parser.json.UserParser;
 import circleplus.app.types.BaseType;
-import circleplus.app.types.Checkin;
 import circleplus.app.types.Status;
-import circleplus.app.types.TypeArrayList;
 
 public class CirclePlusApi {
 
@@ -38,7 +36,7 @@ public class CirclePlusApi {
 
     private static final String REGISTER_URL = CIRCLE_PLUS_URL + "register";
     private static final String LOGIN_URL = CIRCLE_PLUS_URL + "login";
-    private static final String LIST_FAVORITE_URL = CIRCLE_PLUS_URL + "listFavourite";
+    private static final String LIST_FAVORITE_URL = CIRCLE_PLUS_URL + "listFavorites";
     private static final String CHECKIN_URL = CIRCLE_PLUS_URL + "checkin";
 
     private AbstractHttpApi mHttpApi = null;
@@ -68,10 +66,32 @@ public class CirclePlusApi {
         return mHttpApi.doHttpJsonPost(url, json, new UserParser());
     }
 
-    public TypeArrayList<Checkin> getFavorites() throws IOException, Exception {
+    public BaseType checkin(String name, String nation, String province,
+            String city, String address, String shout, int lat, int lng,
+            int type, long userId) throws IOException, Exception {
+        JSONObject json = new JSONObject();
+        // location
+        json.put("locName", name);
+        json.put("lat", (long) lat);
+        json.put("lng", (long) lng);
+        json.put("nation", nation);
+        json.put("province", province);
+        json.put("city", city);
+        json.put("address", address);
+        json.put("type", type);
+        // check-in
+        json.put("checkinName", name);
+        json.put("shout", shout);
+        json.put("userId", userId);
+        // request
+        URL url = new URL(CHECKIN_URL);
+        return mHttpApi.doHttpJsonPost(url, json, new StatusParser());
+    }
+
+    public BaseType getFavorites(long id) throws IOException, Exception {
         Map<String, String> params = new HashMap<String, String>();
+        params.put("id", String.valueOf(id));
         URL url = AbstractHttpApi.createHttpUrl(LIST_FAVORITE_URL, params);
-        return (TypeArrayList<Checkin>)
-                (mHttpApi.doHttpRequest(url, new ArrayParser(new CheckinParser())));
+        return mHttpApi.doHttpRequest(url, new ArrayParser(new CheckinParser()));
     }
 }

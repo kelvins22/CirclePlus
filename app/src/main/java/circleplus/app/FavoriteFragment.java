@@ -16,6 +16,7 @@
 
 package circleplus.app;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,10 +25,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import circleplus.app.http.CirclePlusApi;
+import circleplus.app.types.BaseType;
 import circleplus.app.types.Checkin;
+import circleplus.app.types.TypeArrayList;
+import circleplus.app.utils.UserUtils;
+import circleplus.app.widgets.CheckinListAdapter;
 
 /**
  * Display favorite places
@@ -36,6 +42,8 @@ public class FavoriteFragment extends Fragment {
 
     private ListView mListView = null;
     private ArrayList<Checkin> mCheckinList = null;
+    private CheckinListAdapter mAdapter = null;
+    private ListFavoriteTask mTask = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,17 +62,59 @@ public class FavoriteFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        new Thread() {
-            @Override
-            public void run() {
-                CirclePlusApi api = new CirclePlusApi();
-                try {
-                    ArrayList<Checkin> checkinArrayList = api.getFavorites();
-                    Toast.makeText(getActivity(), checkinArrayList.toString(), Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        mAdapter = new CheckinListAdapter(getActivity());
+        mListView.setAdapter(mAdapter);
+
+        long id = UserUtils.getUserId(getActivity());
+        if (id > 0L) {
+            mTask = new ListFavoriteTask();
+            mTask.execute(id);
+        } else {
+            Toast.makeText(getActivity(), "You have not login!",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
+    }
+
+    private class ListFavoriteTask extends AsyncTask<Long, Void, BaseType> {
+        @Override
+        protected BaseType doInBackground(Long... params) {
+            long id = params[0];
+            BaseType result = null;
+            CirclePlusApi api = new CirclePlusApi();
+            try {
+                result = api.getFavorites(id);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        }.start();
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(BaseType result) {
+            super.onPostExecute(result);
+            if (result == null) {
+                Toast.makeText(getActivity(), "Network error",
+                        Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (result instanceof circleplus.app.types.Status) {
+                Toast.makeText(getActivity(),
+                        ((circleplus.app.types.Status) result).getMessage(),
+                        Toast.LENGTH_LONG).show();
+            } else if (result instanceof TypeArrayList) {
+                mAdapter.setList((TypeArrayList<Checkin>) result);
+            }
+        }
     }
 }

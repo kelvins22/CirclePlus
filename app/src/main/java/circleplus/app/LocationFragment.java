@@ -16,19 +16,28 @@
 
 package circleplus.app;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.baidu.location.BDLocation;
@@ -58,6 +67,7 @@ import java.util.List;
 
 import circleplus.app.utils.LocationUtils;
 import circleplus.app.widgets.CheckinMapView;
+import circleplus.app.widgets.PoiInfoListAdapter;
 import circleplus.app.widgets.SearchPoiOverlay;
 
 public class LocationFragment extends Fragment implements
@@ -91,6 +101,7 @@ public class LocationFragment extends Fragment implements
     private Button mSearchButton = null;
     private AutoCompleteTextView mSearchText = null;
     private MKSearch mSearch = null;
+    private FragSearchListener mFragSearchListener = null;
     private ArrayAdapter<String> mSuggestAdapter = null;
     private String mCurrentCity = null;
     private boolean mHasLocationData = false;
@@ -98,6 +109,7 @@ public class LocationFragment extends Fragment implements
     // Member fields for locating
     private LocationClient mLocationClient = null;
     private LocationData mLocationData = null;
+    private String mProvince = null;
     private BDLocationListener mLocationListener = new FragLocationListener();
 
     // Location overlay -- blue point
@@ -106,6 +118,9 @@ public class LocationFragment extends Fragment implements
     // Map view
     private CheckinMapView mMapView = null;
     private MapController mMapController = null;
+
+    private CheckinPopupContentView mContentView = null;
+    private PopupWindow mPopupWindow = null;
 
     // Handle locating requests
     boolean isRequest = false;
@@ -205,7 +220,8 @@ public class LocationFragment extends Fragment implements
         // Initialize search
         mSearch = new MKSearch();
         CirclePlusApp app = (CirclePlusApp) getActivity().getApplicationContext();
-        mSearch.init(app.mBMapManager, new FragSearchListener());
+        mFragSearchListener = new FragSearchListener();
+        mSearch.init(app.mBMapManager, mFragSearchListener);
 
         mSuggestAdapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_dropdown_item_1line);
@@ -235,6 +251,10 @@ public class LocationFragment extends Fragment implements
             mSearch.destory();
         }
         mMapView.destroy();
+        if (mPopupWindow != null) {
+            mPopupWindow.dismiss();
+            mPopupWindow = null;
+        }
     }
 
     @Override
@@ -275,6 +295,8 @@ public class LocationFragment extends Fragment implements
              * (1) Search nearby when we have location data (lat lng)
              * (2) Search in city when we have city info
              */
+            mFragSearchListener.setRequestCode(FragSearchListener.REQ_CODE_SEARCH);
+            mSearch.setPoiPageCapacity(20);
             if (mHasLocationData && !TextUtils.isEmpty(poiKey)) {
                 mSearch.poiSearchNearBy(
                         poiKey,
@@ -382,7 +404,57 @@ public class LocationFragment extends Fragment implements
         }
     }
 
+    private void handleSearchPoiResult(MKPoiResult mkPoiResult) {
+        // Move cursor to the first poi point center
+        if (mkPoiResult.getCurrentNumPois() > 0) {
+            // Display all the poi points
+            SearchPoiOverlay overlay = new SearchPoiOverlay(getActivity(),
+                    mMapView, mSearch);
+            overlay.setData(mkPoiResult.getAllPoi());
+            Bundle bundle = new Bundle();
+            bundle.putString(CheckinActivity.KEY_POI_PROVINCE, mProvince);
+            overlay.setExtra(bundle);
+            // Clear old overlays and add new
+            mMapView.getOverlays().clear();
+            mMapView.getOverlays().add(overlay);
+            mMapView.refresh();
+
+            // Move to the first not null info
+            List<MKPoiInfo> infoList = mkPoiResult.getAllPoi();
+            for (MKPoiInfo info : infoList) {
+                // info.pt is null when info.ePoiType == 2 or 4
+                if (info.pt != null) {
+                    mMapView.getController().animateTo(info.pt);
+                    break;
+                }
+            }
+//                  // The typed poi is found in other cities rather than this
+        } else if (mkPoiResult.getCityListNum() > 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Found in ");
+            for (int i = 0, sz = mkPoiResult.getCityListNum(); i < sz; i++) {
+                sb.append(mkPoiResult.getCityListInfo(i).city);
+                sb.append("  ");
+            }
+            // TODO: make it more elegant
+            Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
     private class FragSearchListener implements MKSearchListener {
+
+        static final int REQ_CODE_LIST = 0x1;
+        static final int REQ_CODE_SEARCH = 0x2;
+
+        private int requestCode = 0;
+
+        FragSearchListener() {
+            requestCode = REQ_CODE_SEARCH;
+        }
+
+        public void setRequestCode(int requestCode) {
+            this.requestCode = requestCode;
+        }
 
         @Override
         public void onGetPoiResult(MKPoiResult mkPoiResult, int type, int error) {
@@ -391,36 +463,10 @@ public class LocationFragment extends Fragment implements
                     Toast.makeText(getActivity(), "Nothing found...",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    // Move cursor to the first poi point center
-                    if (mkPoiResult.getCurrentNumPois() > 0) {
-                        // Display all the poi points
-                        SearchPoiOverlay overlay = new SearchPoiOverlay(getActivity(),
-                                mMapView, mSearch);
-                        overlay.setData(mkPoiResult.getAllPoi());
-                        // Clear old overlays and add new
-                        mMapView.getOverlays().clear();
-                        mMapView.getOverlays().add(overlay);
-                        mMapView.refresh();
-
-                        // Move to the first not null info
-                        List<MKPoiInfo> infoList = mkPoiResult.getAllPoi();
-                        for (MKPoiInfo info : infoList) {
-                            // info.pt is null when info.ePoiType == 2 or 4
-                            if (info.pt != null) {
-                                mMapView.getController().animateTo(info.pt);
-                                break;
-                            }
-                        }
-//                  // The typed poi is found in other cities rather than this
-                    } else if (mkPoiResult.getCityListNum() > 0) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Found in ");
-                        for (int i = 0, sz = mkPoiResult.getCityListNum(); i < sz; i++) {
-                            sb.append(mkPoiResult.getCityListInfo(i).city);
-                            sb.append("  ");
-                        }
-                        // TODO: make it more elegant
-                        Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_LONG).show();
+                    if (requestCode == REQ_CODE_SEARCH) {
+                        handleSearchPoiResult(mkPoiResult);
+                    } else if (requestCode == REQ_CODE_LIST) {
+                        handleListPoiResult(mkPoiResult);
                     }
                 } // end else
             } // end if (getActivity() != null)
@@ -523,9 +569,82 @@ public class LocationFragment extends Fragment implements
 
         @Override
         protected boolean dispatchTap() {
-            // TODO: show a popup window
+            LocationData locationData = getMyLocation();
+            mFragSearchListener.setRequestCode(FragSearchListener.REQ_CODE_LIST);
+            mSearch.setPoiPageCapacity(50);
+            mSearch.poiSearchNearBy("美食,娱乐,旅游",
+                    new GeoPoint((int) (locationData.latitude * 1e6),
+                            (int) (locationData.longitude * 1e6)),
+                    LocationUtils.POI_DISTANCE / 2
+            );
+
+            Resources res = getActivity().getResources();
+            DisplayMetrics metrics = res.getDisplayMetrics();
+            int width = metrics.widthPixels * 4 / 5;
+            int height = metrics.heightPixels * 4 / 5;
+
+            mPopupWindow = new PopupWindow();
+            mContentView = new CheckinPopupContentView(getActivity());
+            mContentView.progressBar.setVisibility(View.VISIBLE);
+            mPopupWindow.setWidth(width);
+            mPopupWindow.setHeight(height);
+            mPopupWindow.setFocusable(true);
+            mPopupWindow.setOutsideTouchable(true);
+            mPopupWindow.setBackgroundDrawable(res.getDrawable(
+                    R.drawable.transparent_dark_holo));
+            mPopupWindow.setContentView(mContentView.view);
+            mPopupWindow.setAnimationStyle(R.style.popup_window_anim_style);
+            mPopupWindow.showAtLocation(getActivity().getWindow().getDecorView(),
+                    Gravity.CENTER, 0, 0);
             return true;
         }
     }
 
+    private class CheckinPopupContentView {
+
+        View view = null;
+        ProgressBar progressBar = null;
+        ListView listView = null;
+        PoiInfoListAdapter adapter = null;
+
+        public CheckinPopupContentView(Context context) {
+            LayoutInflater inflater = (LayoutInflater) context
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.checkin_popup_layout, null);
+            progressBar = (ProgressBar) view.findViewById(R.id.action_bar_progress);
+            listView = (ListView) view.findViewById(R.id.popup_content_list_view);
+            progressBar.setIndeterminate(true);
+            adapter = new PoiInfoListAdapter(context);
+            listView.setAdapter(adapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    MKPoiInfo info = (MKPoiInfo) adapter.getItem(position);
+                    if (!TextUtils.isEmpty(info.uid)) {
+                        Intent intent = new Intent(getActivity(), CheckinActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putString(CheckinActivity.KEY_POI_NAME, info.name);
+                        bundle.putString(CheckinActivity.KEY_POI_PROVINCE, mProvince);
+                        bundle.putString(CheckinActivity.KEY_POI_CITY, info.city);
+                        bundle.putString(CheckinActivity.KEY_POI_ADDRESS, info.address);
+                        bundle.putString(CheckinActivity.KEY_POI_UID, info.uid);
+                        bundle.putInt(CheckinActivity.KEY_POI_TYPE, info.ePoiType);
+                        bundle.putInt(CheckinActivity.KEY_POI_LAT, info.pt.getLatitudeE6());
+                        bundle.putInt(CheckinActivity.KEY_POI_LNG, info.pt.getLongitudeE6());
+                        bundle.putBoolean(CheckinActivity.KEY_POI_PANORAMA, info.isPano);
+                        intent.putExtras(bundle);
+                        getActivity().startActivity(intent);
+                    }
+                }
+            });
+        }
+    }
+
+    private void handleListPoiResult(MKPoiResult mkPoiResult) {
+        if (mkPoiResult.getCurrentNumPois() > 0 && mContentView != null) {
+            List<MKPoiInfo> poiInfoList = mkPoiResult.getAllPoi();
+            mContentView.progressBar.setVisibility(View.INVISIBLE);
+            mContentView.adapter.setData(poiInfoList);
+        }
+    }
 }

@@ -41,6 +41,9 @@
         <activity
             android:name="circleplus.app.LoginActivity"
             android:label="@string/label_login" />
+        <activity
+            android:name="circleplus.app.CheckinActivity"
+            android:label="@string/label_checkin" />
         <!-- Baidu Place Detail Activity -->
         <activity
             android:name="com.baidu.mapapi.search.PlaceCaterActivity"

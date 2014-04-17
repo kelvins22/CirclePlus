@@ -23,5 +23,6 @@ public final class ResponseCode {
     public static final int STATUS_EMPTY_ERROR = 0x2;
     public static final int STATUS_USER_EXIST_ERROR = 0x3;
     public static final int STATUS_AUTH_ERROR = 0x4;
+    public static final int STATUS_CHECK_IN_ERROR = 0x5;
 
 }

@@ -54,9 +54,8 @@ public class UserInfoFragment extends Fragment {
         // in order to add logout menu item
         setHasOptionsMenu(true);
 
-        if (UserUtils.getUserId(getActivity()) == -1) {
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            startActivityForResult(intent, LOGIN_REQ_CODE);
+        if (UserUtils.getUserId(getActivity()) == -1L) {
+            mUser = null;
         } else {
             mUser = UserUtils.getUserInfo(getActivity());
         }
@@ -85,7 +84,9 @@ public class UserInfoFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
 
         refreshViewInfo();
-        // TODO: add checkin, follower, friend Activity jump
+        mCheckinText.setOnClickListener(mClickListener);
+        mFollowerText.setOnClickListener(mClickListener);
+        mFriendText.setOnClickListener(mClickListener);
     }
 
     @Override
@@ -157,4 +158,11 @@ public class UserInfoFragment extends Fragment {
         mFriendText.setText(getString(R.string.friend_count_title)
                 + "\n     " + mUser.getFriendCount());
     }
+
+    private View.OnClickListener mClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // TODO: go to Activity
+        }
+    };
 }

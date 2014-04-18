@@ -34,6 +34,7 @@ public class UserUtils {
     public static final String KEY_USER_NAME = "user_utils_key_user_name";
     public static final String KEY_USER_PHONE = "user_utils_key_user_phone";
     public static final String KEY_USER_PHOTO = "user_utils_key_user_photo";
+    public static final String KEY_USER_TOKEN = "user_utils_key_user_token";
 
     public static void storeUserInfo(Context context, User user) {
         if (user == null) {
@@ -57,6 +58,14 @@ public class UserUtils {
         editor.commit();
     }
 
+    public static void storeUserToken(Context context, String token) {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString(KEY_USER_TOKEN, token);
+        editor.commit();
+    }
+
     public static void cleanUserInfo(Context context) {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(context);
@@ -71,6 +80,7 @@ public class UserUtils {
         editor.remove(KEY_USER_NAME);
         editor.remove(KEY_USER_PHONE);
         editor.remove(KEY_USER_PHOTO);
+        editor.remove(KEY_USER_TOKEN);
         editor.commit();
     }
 
@@ -110,5 +120,11 @@ public class UserUtils {
         user.setPhone(prefs.getString(KEY_USER_PHONE, ""));
         user.setPhoto(prefs.getString(KEY_USER_PHOTO, ""));
         return user;
+    }
+
+    public static String getUserToken(Context context) {
+        SharedPreferences prefs = PreferenceManager
+                .getDefaultSharedPreferences(context);
+        return prefs.getString(KEY_USER_TOKEN, "");
     }
 }

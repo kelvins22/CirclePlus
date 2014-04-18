@@ -16,6 +16,8 @@
 
 package circleplus.app;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -31,7 +33,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import circleplus.app.utils.UserUtils;
+
 public class MainActivity extends ActionBarActivity {
+
+    private static final int REQ_CODE_LOGIN_FAVORITE = 0x1;
+    private static final int REQ_CODE_LOGIN_INFO = 0x2;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -169,8 +176,10 @@ public class MainActivity extends ActionBarActivity {
             Bundle args = new Bundle();
             fragment.setArguments(args);
         } else if (position == 1) {
+            checkLogin(REQ_CODE_LOGIN_FAVORITE);
             fragment = new FavoriteFragment();
         } else {
+            checkLogin(REQ_CODE_LOGIN_INFO);
             fragment = new UserInfoFragment();
         }
 
@@ -191,5 +200,20 @@ public class MainActivity extends ActionBarActivity {
     public void setTitle(CharSequence title) {
         mTitle = title;
         getSupportActionBar().setTitle(mTitle);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            selectItem(requestCode);
+        }
+    }
+
+    private void checkLogin(int requestCode) {
+        if (UserUtils.getUserId(MainActivity.this) < 0L) {
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivityForResult(intent, requestCode);
+        }
     }
 }

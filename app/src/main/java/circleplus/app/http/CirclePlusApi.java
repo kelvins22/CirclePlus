@@ -88,9 +88,11 @@ public class CirclePlusApi {
         return mHttpApi.doHttpJsonPost(url, json, new StatusParser());
     }
 
-    public BaseType getFavorites(long id) throws IOException, Exception {
+    public BaseType getFavorites(long id, String token)
+            throws IOException, Exception {
         Map<String, String> params = new HashMap<String, String>();
         params.put("id", String.valueOf(id));
+        params.put("token", token);
         URL url = AbstractHttpApi.createHttpUrl(LIST_FAVORITE_URL, params);
         return mHttpApi.doHttpRequest(url, new ArrayParser(new CheckinParser()));
     }

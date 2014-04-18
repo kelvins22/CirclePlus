@@ -36,6 +36,7 @@ import java.io.IOException;
 import circleplus.app.http.CirclePlusApi;
 import circleplus.app.types.BaseType;
 import circleplus.app.types.User;
+import circleplus.app.utils.MD5Utils;
 import circleplus.app.utils.UserUtils;
 
 public class LoginActivity extends ActionBarActivity {
@@ -121,7 +122,7 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != Activity.RESULT_OK) {
+        if (resultCode != Activity.RESULT_OK) {
             return;
         }
         if (requestCode == GO_TO_REGISTER_REQ_CODE) {
@@ -156,8 +157,12 @@ public class LoginActivity extends ActionBarActivity {
     }
 
     private class LoginTask extends AsyncTask<LoginData, Void, BaseType> {
+        private String username = null, password = null;
+
         @Override
         protected BaseType doInBackground(LoginData... params) {
+            username = params[0].username;
+            password = params[0].password;
             CirclePlusApi api = new CirclePlusApi();
             BaseType result = null;
             try {
@@ -181,12 +186,14 @@ public class LoginActivity extends ActionBarActivity {
             super.onPostExecute(status);
             LoginActivity.this.setProgressBarIndeterminateVisibility(false);
             if (status == null) {
+                username = password = null;
                 Toast.makeText(LoginActivity.this, "Network error",
                         Toast.LENGTH_SHORT).show();
                 return;
             }
 
             if (status instanceof circleplus.app.types.Status) {
+                username = password = null;
                 Toast.makeText(LoginActivity.this,
                         ((circleplus.app.types.Status) status).getMessage(),
                         Toast.LENGTH_LONG).show();
@@ -196,6 +203,9 @@ public class LoginActivity extends ActionBarActivity {
                     @Override
                     public void run() {
                         UserUtils.storeUserInfo(LoginActivity.this, user);
+                        String token = MD5Utils.hashKey(username + password);
+                        username = password = null;
+                        UserUtils.storeUserToken(LoginActivity.this, token);
                         setResult(Activity.RESULT_OK);
                         finish();
                     }

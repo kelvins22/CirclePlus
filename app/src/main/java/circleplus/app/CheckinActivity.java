@@ -142,18 +142,19 @@ public class CheckinActivity extends ActionBarActivity {
                         .setStatusCode(ResponseCode.STATUS_CHECK_IN_ERROR);
                 ((circleplus.app.types.Status) result)
                         .setMessage("You have NOT login!");
-            }
-            CirclePlusApi api = new CirclePlusApi();
-            if (TextUtils.isEmpty(mProvince)) {
-                mProvince = "浙江";
-            }
-            try {
-                result = api.checkin(mName, "中国", mProvince, mCity, mAddress,
-                        shout, mLat, mLng, mType, uid);
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } else {
+                CirclePlusApi api = new CirclePlusApi();
+                if (TextUtils.isEmpty(mProvince)) {
+                    mProvince = "浙江";
+                }
+                try {
+                    result = api.checkin(mName, "中国", mProvince, mCity, mAddress,
+                            shout, mLat, mLng, mType, uid);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
             return result;
         }

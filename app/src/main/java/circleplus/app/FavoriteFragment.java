@@ -41,9 +41,9 @@ import circleplus.app.widgets.CheckinListAdapter;
 public class FavoriteFragment extends Fragment {
 
     private ListView mListView = null;
-    private ArrayList<Checkin> mCheckinList = null;
     private CheckinListAdapter mAdapter = null;
     private ListFavoriteTask mTask = null;
+    private String mToken = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,13 +66,9 @@ public class FavoriteFragment extends Fragment {
         mListView.setAdapter(mAdapter);
 
         long id = UserUtils.getUserId(getActivity());
-        if (id > 0L) {
-            mTask = new ListFavoriteTask();
-            mTask.execute(id);
-        } else {
-            Toast.makeText(getActivity(), "You have not login!",
-                    Toast.LENGTH_SHORT).show();
-        }
+        mToken = UserUtils.getUserToken(getActivity());
+        mTask = new ListFavoriteTask();
+        mTask.execute(id);
     }
 
     @Override
@@ -90,7 +86,8 @@ public class FavoriteFragment extends Fragment {
             BaseType result = null;
             CirclePlusApi api = new CirclePlusApi();
             try {
-                result = api.getFavorites(id);
+                result = api.getFavorites(id, mToken);
+                mToken = null;
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (Exception ex) {
@@ -116,5 +113,5 @@ public class FavoriteFragment extends Fragment {
                 mAdapter.setList((TypeArrayList<Checkin>) result);
             }
         }
-    }
+    } // end ListFavoriteTask
 }

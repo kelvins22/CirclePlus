@@ -25,6 +25,7 @@ import java.util.Map;
 
 import circleplus.app.parser.json.ArrayParser;
 import circleplus.app.parser.json.CheckinParser;
+import circleplus.app.parser.json.LocParser;
 import circleplus.app.parser.json.StatusParser;
 import circleplus.app.parser.json.UserParser;
 import circleplus.app.types.BaseType;
@@ -41,6 +42,7 @@ public class CirclePlusApi {
     private static final String REGISTER_BUSINESS_URL = CIRCLE_PLUS_URL + "registerBusiness";
     private static final String LIST_CHECKIN_HISTORY_URL = CIRCLE_PLUS_URL + "listCheckinHistory";
     private static final String GRANT_SCORE_URL = CIRCLE_PLUS_URL + "grantScore";
+    private static final String LIST_BUSINESS_LOCATION = CIRCLE_PLUS_URL + "listBusinessLocation";
 
     private AbstractHttpApi mHttpApi = null;
 
@@ -137,5 +139,10 @@ public class CirclePlusApi {
         json.put("score", score);
         URL url = new URL(GRANT_SCORE_URL);
         return mHttpApi.doHttpJsonPost(url, json, new StatusParser());
+    }
+
+    public BaseType getBusinessLocation() throws IOException, Exception {
+        URL url = new URL(LIST_BUSINESS_LOCATION);
+        return mHttpApi.doHttpRequest(url, new ArrayParser(new LocParser()));
     }
 }

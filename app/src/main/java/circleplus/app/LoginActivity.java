@@ -53,6 +53,7 @@ public class LoginActivity extends ActionBarActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.login_layout);
 
+        setProgressBarIndeterminateVisibility(false);
         setResult(Activity.RESULT_CANCELED);
 
         mUsernameEdit = (EditText) findViewById(R.id.login_username_edit);
@@ -135,7 +136,9 @@ public class LoginActivity extends ActionBarActivity {
                 password = (String) bundle.get("key_register_password");
             }
             if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(password)) {
-                mTask.cancel(true);
+                if (mTask != null) {
+                    mTask.cancel(true);
+                }
                 mTask = new LoginTask();
                 LoginData loginData = new LoginData();
                 loginData.username = username;

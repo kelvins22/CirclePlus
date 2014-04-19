@@ -27,6 +27,7 @@ public class Checkin implements BaseType, Parcelable {
     private long mId;
     private Loc mLoc;
     private String mName;
+    private int mScore;
     private String mShout;
     private User mUser;
 
@@ -37,6 +38,7 @@ public class Checkin implements BaseType, Parcelable {
         mCreated = ParcelUtils.readStringFromParcel(in);
         mId = in.readLong();
         mName = ParcelUtils.readStringFromParcel(in);
+        mScore = in.readInt();
         mShout = ParcelUtils.readStringFromParcel(in);
 
         if (in.readInt() == 1) {
@@ -93,6 +95,14 @@ public class Checkin implements BaseType, Parcelable {
         mName = name;
     }
 
+    public int getScore() {
+        return mScore;
+    }
+
+    public void setScore(int score) {
+        mScore = score;
+    }
+
     public String getShout() {
         return mShout;
     }
@@ -114,6 +124,7 @@ public class Checkin implements BaseType, Parcelable {
         ParcelUtils.writeStringToParcel(out, mCreated);
         out.writeLong(mId);
         ParcelUtils.writeStringToParcel(out, mName);
+        out.writeInt(mScore);
         ParcelUtils.writeStringToParcel(out, mShout);
 
         if (mLoc != null) {

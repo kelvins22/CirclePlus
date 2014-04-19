@@ -85,7 +85,7 @@ public abstract class AbstractHttpApi implements HttpApi {
                 case 200:
                     is = conn.getInputStream();
                     // TODO: calculate length
-                    String content = readStream(is, 2048);
+                    String content = readStream(is, 2048 * 4);
                     if (D) Log.d(TAG, content);
                     return JSONUtils.consume(parser, content);
 

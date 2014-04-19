@@ -49,6 +49,7 @@ public class CheckinListAdapter extends BaseListAdapter {
             holder.name = (TextView) convertView.findViewById(R.id.fav_place_name);
             holder.detail = (TextView) convertView.findViewById(R.id.fav_place_detail);
             holder.text = (TextView) convertView.findViewById(R.id.fav_place_text);
+            holder.score = (TextView) convertView.findViewById(R.id.fav_place_score);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -59,6 +60,7 @@ public class CheckinListAdapter extends BaseListAdapter {
         holder.name.setText(checkin.getName());
         holder.detail.setText(checkin.getLoc().getAddress());
         holder.text.setText(checkin.getShout());
+        holder.score.setText("Score: " + checkin.getScore());
 
         return convertView;
     }
@@ -69,5 +71,6 @@ public class CheckinListAdapter extends BaseListAdapter {
         TextView name;
         TextView detail;
         TextView text;
+        TextView score;
     }
 }

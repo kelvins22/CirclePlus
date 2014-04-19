@@ -26,7 +26,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import circleplus.app.http.CirclePlusApi;
 import circleplus.app.types.BaseType;

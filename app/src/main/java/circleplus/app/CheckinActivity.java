@@ -65,6 +65,8 @@ public class CheckinActivity extends ActionBarActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.checkin_layout);
 
+        setProgressBarIndeterminateVisibility(false);
+
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             mUid = bundle.getString(KEY_POI_UID);

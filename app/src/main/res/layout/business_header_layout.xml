@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="74dp"
+        android:layout_height="74dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="30dp"
+        android:src="@drawable/business_checkin" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="110dp"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/loading_animation" />
+
+</FrameLayout>

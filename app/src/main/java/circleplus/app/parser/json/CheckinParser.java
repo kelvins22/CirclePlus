@@ -35,6 +35,9 @@ public class CheckinParser extends AbstractParser<Checkin> {
         if (json.has("name")) {
             obj.setName(json.getString("name"));
         }
+        if (json.has("score")) {
+            obj.setScore(json.getInt("score"));
+        }
         if (json.has("shout")) {
             obj.setShout(json.getString("shout"));
         }

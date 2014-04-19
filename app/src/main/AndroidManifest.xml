@@ -50,6 +50,9 @@
         <activity
             android:name="circleplus.app.GrantScoreActivity"
             android:label="@string/label_grant_score" />
+        <activity
+            android:name="circleplus.app.BusinessCheckinActivity"
+            android:label="@string/label_checkin" />
         <!-- Baidu Place Detail Activity -->
         <activity
             android:name="com.baidu.mapapi.search.PlaceCaterActivity"

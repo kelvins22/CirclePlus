@@ -58,6 +58,7 @@ public class RegisterActivity extends ActionBarActivity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.register_layout);
 
+        setProgressBarIndeterminateVisibility(false);
         setResult(Activity.RESULT_CANCELED);
 
         mUsernameEdit = (EditText) findViewById(R.id.username_edit);

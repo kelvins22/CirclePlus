@@ -607,6 +607,7 @@ public class LocationFragment extends Fragment implements
     private class CheckinPopupContentView {
 
         View view = null;
+        View headerView = null;
         ProgressBar progressBar = null;
         ListView listView = null;
         PoiInfoListAdapter adapter = null;
@@ -614,32 +615,39 @@ public class LocationFragment extends Fragment implements
         public CheckinPopupContentView(Context context) {
             LayoutInflater inflater = (LayoutInflater) context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            headerView = inflater.inflate(R.layout.business_header_layout, null);
             view = inflater.inflate(R.layout.checkin_popup_layout, null);
             progressBar = (ProgressBar) view.findViewById(R.id.action_bar_progress);
             listView = (ListView) view.findViewById(R.id.popup_content_list_view);
             progressBar.setIndeterminate(true);
             adapter = new PoiInfoListAdapter(context);
+            listView.addHeaderView(headerView);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    MKPoiInfo info = (MKPoiInfo) adapter.getItem(position);
-                    if (!TextUtils.isEmpty(info.uid)) {
-                        Intent intent = new Intent(getActivity(), CheckinActivity.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putString(CheckinActivity.KEY_POI_NAME, info.name);
-                        bundle.putString(CheckinActivity.KEY_POI_PROVINCE, mProvince);
-                        bundle.putString(CheckinActivity.KEY_POI_CITY, info.city);
-                        bundle.putString(CheckinActivity.KEY_POI_ADDRESS, info.address);
-                        bundle.putString(CheckinActivity.KEY_POI_UID, info.uid);
-                        bundle.putInt(CheckinActivity.KEY_POI_TYPE, info.ePoiType);
-                        bundle.putInt(CheckinActivity.KEY_POI_LAT, info.pt.getLatitudeE6());
-                        bundle.putInt(CheckinActivity.KEY_POI_LNG, info.pt.getLongitudeE6());
-                        bundle.putBoolean(CheckinActivity.KEY_POI_PANORAMA, info.isPano);
-                        intent.putExtras(bundle);
-                        getActivity().startActivity(intent);
+                    if (view == headerView) {
+                        Intent intent = new Intent(getActivity(), BusinessCheckinActivity.class);
+                        startActivity(intent);
+                    } else {
+                        MKPoiInfo info = (MKPoiInfo) adapter.getItem(position);
+                        if (!TextUtils.isEmpty(info.uid)) {
+                            Intent intent = new Intent(getActivity(), CheckinActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putString(CheckinActivity.KEY_POI_NAME, info.name);
+                            bundle.putString(CheckinActivity.KEY_POI_PROVINCE, mProvince);
+                            bundle.putString(CheckinActivity.KEY_POI_CITY, info.city);
+                            bundle.putString(CheckinActivity.KEY_POI_ADDRESS, info.address);
+                            bundle.putString(CheckinActivity.KEY_POI_UID, info.uid);
+                            bundle.putInt(CheckinActivity.KEY_POI_TYPE, info.ePoiType);
+                            bundle.putInt(CheckinActivity.KEY_POI_LAT, info.pt.getLatitudeE6());
+                            bundle.putInt(CheckinActivity.KEY_POI_LNG, info.pt.getLongitudeE6());
+                            bundle.putBoolean(CheckinActivity.KEY_POI_PANORAMA, info.isPano);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+                        }
                     }
-                }
+                } // end onItemClick()
             });
         }
     }

@@ -36,11 +36,27 @@
     <string name="friend_count_title">Friend:</string>
     <string name="action_check_in">Check In</string>
     <string name="label_checkin">Checkin</string>
+    <string name="location_name">Location Name:</string>
+    <string name="address_name">Address Name:</string>
+    <string name="lat_value">Lat Value:</string>
+    <string name="lng_value">Lng Value:</string>
+    <string name="business_name">Business Name:</string>
+    <string name="location_type">Location Type: (1) Education (2) Travel (3) Food (4) Entertainment (5) Traffic</string>
+    <string name="register_business">Register Business</string>
+    <string name="label_business">Business</string>
+    <string name="label_grant_score">Score</string>
+    <string name="grant">GRANT</string>
+    <string name="checkin_name">Checkin Name:</string>
+    <string name="checkin_time">Checkin Time:</string>
+    <string name="checkin_user">Checkin User:</string>
+    <string name="checkin_shout">Checkin Shout:</string>
+    <string name="grant_it_score">Grant it a score:</string>
 
     <string-array name="titles_array">
         <item>Home</item>
         <item>Favorites</item>
         <item>About Me</item>
+        <item>Business</item>
     </string-array>
 
 </resources>

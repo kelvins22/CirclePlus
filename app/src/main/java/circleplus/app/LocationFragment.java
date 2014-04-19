@@ -204,6 +204,7 @@ public class LocationFragment extends Fragment implements
         option.setOpenGps(LocationUtils.OPEN_GPS);
         option.setCoorType(LocationUtils.COORDINATE_TYPE);
         option.setScanSpan(LocationUtils.SCAN_SPAN);
+        option.setIsNeedAddress(LocationUtils.NEED_ADDRESS);
         mLocationClient.setLocOption(option);
         mLocationClient.start();
 
@@ -304,7 +305,7 @@ public class LocationFragment extends Fragment implements
                                 (int) (mLocationData.longitude * 1e6)),
                         LocationUtils.POI_DISTANCE
                 );
-            } else if (mCurrentCity != null && !TextUtils.isEmpty(poiKey)) {
+            } else if (!TextUtils.isEmpty(mCurrentCity) && !TextUtils.isEmpty(poiKey)) {
                 mSearch.poiSearchInCity(poiKey, mCurrentCity);
             } else if (!TextUtils.isEmpty(poiKey)) {
                 Toast.makeText(getActivity(), "Can not get poi info",
@@ -360,6 +361,9 @@ public class LocationFragment extends Fragment implements
             mLocationData.direction = location.getDirection();
             mLocationData.satellitesNum = location.getSatelliteNumber();
             mLocationData.speed = location.getSpeed();
+
+            mProvince = location.getProvince();
+            mCurrentCity = location.getCity();
 
             /*
              * Everything relative to poi not lat lng,
@@ -428,7 +432,7 @@ public class LocationFragment extends Fragment implements
                     break;
                 }
             }
-//                  // The typed poi is found in other cities rather than this
+//      // The typed poi is found in other cities rather than this
         } else if (mkPoiResult.getCityListNum() > 0) {
             StringBuilder sb = new StringBuilder();
             sb.append("Found in ");

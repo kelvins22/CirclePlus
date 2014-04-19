@@ -33,12 +33,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import circleplus.app.types.User;
 import circleplus.app.utils.UserUtils;
 
 public class MainActivity extends ActionBarActivity {
 
     private static final int REQ_CODE_LOGIN_FAVORITE = 0x1;
     private static final int REQ_CODE_LOGIN_INFO = 0x2;
+    private static final int REQ_CODE_LOGIN_BUSINESS = 0x3;
 
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
@@ -170,17 +172,28 @@ public class MainActivity extends ActionBarActivity {
      */
     private void selectItem(int position) {
         // Create a new fragment and specify the content to show based on position
-        Fragment fragment;
+        Fragment fragment = null;
         if (position == 0) {
             fragment = new LocationFragment();
             Bundle args = new Bundle();
             fragment.setArguments(args);
         } else if (position == 1) {
-            checkLogin(REQ_CODE_LOGIN_FAVORITE);
-            fragment = new FavoriteFragment();
-        } else {
-            checkLogin(REQ_CODE_LOGIN_INFO);
-            fragment = new UserInfoFragment();
+            if (checkLogin(REQ_CODE_LOGIN_FAVORITE)) {
+                fragment = new FavoriteFragment();
+            }
+        } else if (position == 2) {
+            if (checkLogin(REQ_CODE_LOGIN_INFO)) {
+                fragment = new UserInfoFragment();
+            }
+        } else if (position == 3) {
+            if (checkLogin(REQ_CODE_LOGIN_BUSINESS)
+                    && checkIsBusiness()) {
+                fragment = new BusinessFragment();
+            }
+        }
+
+        if (fragment == null) {
+            return;
         }
 
         // Insert the fragment by replacing any existing fragment
@@ -210,10 +223,23 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void checkLogin(int requestCode) {
+    private boolean checkLogin(int requestCode) {
         if (UserUtils.getUserId(MainActivity.this) < 0L) {
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivityForResult(intent, requestCode);
+            return false;
         }
+        return true;
+    }
+
+    private boolean checkIsBusiness() {
+        User user = UserUtils.getUserInfo(MainActivity.this);
+        if (!user.getIsBusiness()) {
+            Intent intent = new Intent(MainActivity.this,
+                    RegisterBusinessActivity.class);
+            startActivityForResult(intent, REQ_CODE_LOGIN_BUSINESS);
+            return false;
+        }
+        return true;
     }
 }

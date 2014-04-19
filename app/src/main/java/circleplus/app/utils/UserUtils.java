@@ -35,6 +35,7 @@ public class UserUtils {
     public static final String KEY_USER_PHONE = "user_utils_key_user_phone";
     public static final String KEY_USER_PHOTO = "user_utils_key_user_photo";
     public static final String KEY_USER_TOKEN = "user_utils_key_user_token";
+    public static final String KEY_USER_BUSINESS = "user_utils_key_user_business";
 
     public static void storeUserInfo(Context context, User user) {
         if (user == null) {
@@ -52,6 +53,7 @@ public class UserUtils {
         editor.putInt(KEY_FRIEND_COUNT, user.getFriendCount());
         editor.putString(KEY_USER_GENDER, user.getGender());
         editor.putLong(KEY_USER_ID, user.getId());
+        editor.putBoolean(KEY_USER_BUSINESS, user.getIsBusiness());
         editor.putString(KEY_USER_NAME, user.getName());
         editor.putString(KEY_USER_PHONE, user.getPhone());
         editor.putString(KEY_USER_PHOTO, user.getPhoto());
@@ -77,6 +79,7 @@ public class UserUtils {
         editor.remove(KEY_FRIEND_COUNT);
         editor.remove(KEY_USER_GENDER);
         editor.remove(KEY_USER_ID);
+        editor.remove(KEY_USER_BUSINESS);
         editor.remove(KEY_USER_NAME);
         editor.remove(KEY_USER_PHONE);
         editor.remove(KEY_USER_PHOTO);
@@ -116,6 +119,7 @@ public class UserUtils {
         user.setFriendCount(prefs.getInt(KEY_FRIEND_COUNT, 0));
         user.setGender(prefs.getString(KEY_USER_GENDER, "Male"));
         user.setId(prefs.getLong(KEY_USER_ID, -1L));
+        user.setIsBusiness(prefs.getBoolean(KEY_USER_BUSINESS, false));
         user.setName(prefs.getString(KEY_USER_NAME, ""));
         user.setPhone(prefs.getString(KEY_USER_PHONE, ""));
         user.setPhoto(prefs.getString(KEY_USER_PHOTO, ""));

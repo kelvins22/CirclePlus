@@ -37,6 +37,7 @@ import java.io.IOException;
 
 import circleplus.app.http.CirclePlusApi;
 import circleplus.app.http.ResponseCode;
+import circleplus.app.types.BaseType;
 
 public class RegisterActivity extends ActionBarActivity {
 
@@ -161,7 +162,7 @@ public class RegisterActivity extends ActionBarActivity {
         }
     }
 
-    private class RegisterTask extends AsyncTask<RegisterData, Void, circleplus.app.types.Status> {
+    private class RegisterTask extends AsyncTask<RegisterData, Void, BaseType> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -169,11 +170,11 @@ public class RegisterActivity extends ActionBarActivity {
         }
 
         @Override
-        protected circleplus.app.types.Status doInBackground(RegisterData... params) {
+        protected BaseType doInBackground(RegisterData... params) {
             CirclePlusApi api = new CirclePlusApi();
-            circleplus.app.types.Status status = null;
+            BaseType result = null;
             try {
-                status = api.register(
+                result = api.register(
                         params[0].username, params[0].password, params[0].email,
                         params[0].phone, params[0].gender);
             } catch (IOException e) {
@@ -181,46 +182,52 @@ public class RegisterActivity extends ActionBarActivity {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            return status;
+            return result;
         }
 
         @Override
-        protected void onPostExecute(circleplus.app.types.Status s) {
-            super.onPostExecute(s);
+        protected void onPostExecute(BaseType result) {
+            super.onPostExecute(result);
             RegisterActivity.this.setProgressBarIndeterminateVisibility(false);
-            if (s == null) {
+            if (result == null) {
                 Toast.makeText(RegisterActivity.this, "Network error",
                         Toast.LENGTH_SHORT).show();
                 setResult(Activity.RESULT_CANCELED);
                 return;
             }
 
-            Toast.makeText(RegisterActivity.this, s.getMessage(),
-                    Toast.LENGTH_LONG).show();
-            if (s.getStatusCode() == ResponseCode.STATUS_OK) {
-                Editable editable = mUsernameEdit.getText();
-                if (editable != null) {
-                    editable.clear();
-                }
-                editable = mPasswordEdit.getText();
-                if (editable != null) {
-                    editable.clear();
-                }
-                editable = mEmailEdit.getText();
-                if (editable != null) {
-                    editable.clear();
-                }
-                editable = mPhoneEdit.getText();
-                if (editable != null) {
-                    editable.clear();
-                }
+            if (result instanceof circleplus.app.types.Status) {
+                circleplus.app.types.Status s = (circleplus.app.types.Status) result;
+                Toast.makeText(RegisterActivity.this, s.getMessage(),
+                        Toast.LENGTH_LONG).show();
+                if (s.getStatusCode() == ResponseCode.STATUS_OK) {
+                    Editable editable = mUsernameEdit.getText();
+                    if (editable != null) {
+                        editable.clear();
+                    }
+                    editable = mPasswordEdit.getText();
+                    if (editable != null) {
+                        editable.clear();
+                    }
+                    editable = mEmailEdit.getText();
+                    if (editable != null) {
+                        editable.clear();
+                    }
+                    editable = mPhoneEdit.getText();
+                    if (editable != null) {
+                        editable.clear();
+                    }
 
-                Bundle bundle = new Bundle();
-                bundle.putString("key_register_username", mUsername);
-                bundle.putString("key_register_password", mPassword);
-                Intent intent = new Intent();
-                intent.putExtras(bundle);
-                setResult(Activity.RESULT_OK, intent);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("key_register_username", mUsername);
+                    bundle.putString("key_register_password", mPassword);
+                    Intent intent = new Intent();
+                    intent.putExtras(bundle);
+                    setResult(Activity.RESULT_OK, intent);
+                }
+            } else {
+                Toast.makeText(RegisterActivity.this, "Result parse error",
+                        Toast.LENGTH_SHORT).show();
             }
         }
 

@@ -47,6 +47,9 @@ public class UserParser extends AbstractParser<User> {
         if (json.has("id")) {
             obj.setId(json.getLong("id"));
         }
+        if (json.has("isBusiness")) {
+            obj.setIsBusiness(json.getBoolean("isBusiness"));
+        }
         if (json.has("name")) {
             obj.setName(json.getString("name"));
         }

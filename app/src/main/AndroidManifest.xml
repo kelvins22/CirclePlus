@@ -44,6 +44,12 @@
         <activity
             android:name="circleplus.app.CheckinActivity"
             android:label="@string/label_checkin" />
+        <activity
+            android:name="circleplus.app.RegisterBusinessActivity"
+            android:label="@string/label_business" />
+        <activity
+            android:name="circleplus.app.GrantScoreActivity"
+            android:label="@string/label_grant_score" />
         <!-- Baidu Place Detail Activity -->
         <activity
             android:name="com.baidu.mapapi.search.PlaceCaterActivity"

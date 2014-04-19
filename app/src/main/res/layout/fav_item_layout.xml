@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/fav_star"
+        android:src="@drawable/checkin"
         android:scaleType="centerCrop"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp" />

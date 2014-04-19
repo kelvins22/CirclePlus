@@ -30,6 +30,7 @@ public class User implements BaseType, Parcelable {
     private int mFriendCount;
     private String mGender;
     private long mId;
+    private boolean mIsBusiness;
     private String mName;
     private String mPhone;
     private String mPhoto;
@@ -45,6 +46,7 @@ public class User implements BaseType, Parcelable {
         mFriendCount = in.readInt();
         mGender = ParcelUtils.readStringFromParcel(in);
         mId = in.readLong();
+        mIsBusiness = in.readInt() == 1;
         mName = ParcelUtils.readStringFromParcel(in);
         mPhone = ParcelUtils.readStringFromParcel(in);
         mPhoto = ParcelUtils.readStringFromParcel(in);
@@ -120,6 +122,14 @@ public class User implements BaseType, Parcelable {
         mId = id;
     }
 
+    public boolean getIsBusiness() {
+        return mIsBusiness;
+    }
+
+    public void setIsBusiness(boolean isBusiness) {
+        mIsBusiness = isBusiness;
+    }
+
     public String getName() {
         return mName;
     }
@@ -153,6 +163,7 @@ public class User implements BaseType, Parcelable {
         out.writeInt(mFriendCount);
         ParcelUtils.writeStringToParcel(out, mGender);
         out.writeLong(mId);
+        out.writeInt(mIsBusiness ? 1 : 0);
         ParcelUtils.writeStringToParcel(out, mName);
         ParcelUtils.writeStringToParcel(out, mPhone);
         ParcelUtils.writeStringToParcel(out, mPhoto);

@@ -24,6 +24,7 @@ public final class LocationUtils {
     public static final boolean OPEN_GPS = true;
     public static final boolean ENABLE_MAP_CLICK = true;
     public static final boolean ENABLE_BUILT_IN_ZOOM_CONTROLS = true;
+    public static final boolean NEED_ADDRESS = true;
 
     public static final String COORDINATE_TYPE = "bd0911";
 
